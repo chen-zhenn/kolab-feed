@@ -4,6 +4,11 @@ import {
     GridTemplate,  
 } from '../types'
 
+
+const shared = () => `
+    background-color: rgba(255, 197, 32, 1);
+` 
+
 export const Wrap = styled.div<{ grid: GridTemplate }>`
     position: relative;
     display: grid;
@@ -12,10 +17,10 @@ export const Wrap = styled.div<{ grid: GridTemplate }>`
 `
 
 export const Header = styled.header`
+    ${shared}
     grid-row: 1;
     grid-column: 2 / 3;
     padding: 1.75rem;
-    background-color: rgba(255, 197, 32, 1);
 `
 
 export const Content = styled.main`
@@ -32,8 +37,10 @@ export const Sidebar = styled.aside`
 `
 
 export const Footer = styled.footer`
+    ${shared}
     grid-row: 3;
     grid-column: 1 / 3;
+    text-align: center;
 `
 
 export const Generic = styled.div``

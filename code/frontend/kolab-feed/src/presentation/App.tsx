@@ -6,7 +6,8 @@ import {
 
 import { 
   Header,
-  Sidebar, 
+  Sidebar,
+  Footer, 
 }  from '@/presentation/includes'
 
 function App() {
@@ -25,6 +26,10 @@ function App() {
 
       <Layout.Module type='sidebar'>
           <Sidebar />
+      </Layout.Module>
+
+      <Layout.Module type='footer'>
+          <Footer />
       </Layout.Module>
 
     </Layout.Wrap>
