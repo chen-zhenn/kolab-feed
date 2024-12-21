@@ -12,9 +12,11 @@ export const Container = styled.div`
     align-items: center;
     gap: 1.75rem;
 
-    @media(min-width: ${breakpoints.medium}) {
-        display: grid;
-    }
+    @media(min-width: ${breakpoints.medium}) {}
 `
 
-export const Section = styled.section``
+export const Section = styled.section`
+    &.-search {
+        margin-right: auto;
+    }    
+`
