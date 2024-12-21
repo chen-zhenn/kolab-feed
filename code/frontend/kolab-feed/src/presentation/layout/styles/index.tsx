@@ -13,7 +13,14 @@ export const Wrap = styled.div<{ grid: GridTemplate }>`
     position: relative;
     display: grid;
     grid-template-columns: ${(props) => setGridLayout(props.grid) };
+    width: 100%;
     min-height: 100vh;
+    transition: transform .33s ease;
+
+    &.-full {
+        width: 138vw;
+        transform: translateX(-38.2vw);
+    }
 `
 
 export const Header = styled.header`
@@ -34,6 +41,7 @@ export const Sidebar = styled.aside`
     grid-column: 1 / 2;
     color: rgba(255, 255, 255, 1);
     background-color: rgba(26, 32, 44, 1);
+
 `
 
 export const Footer = styled.footer`
