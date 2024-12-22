@@ -13,7 +13,7 @@ import {
 
 import { UIContext } from '@/states/context'
 
-import { Avatar } from '@/presentation/components/vendor'
+import { Avatar } from '@/presentation/components'
 
 import { 
     Section,
