@@ -10,7 +10,7 @@ import {
     MenuContent,
     MenuItem,
     Button, 
-} from '@/presentation/components/ui'
+} from '@/presentation/components/vendor'
 
 import { IPostHeader } from './types'
 import { ActionContainer } from './styles'

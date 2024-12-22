@@ -1,12 +1,31 @@
 import { 
+    // useEffect, 
+    // useState 
+} from 'react'
+
+import { 
     useLoaderData,
     useNavigate,
     useLocation,
 } from 'react-router'
 
+// import { 
+//     LuCheck,
+//     LuPencilLine, 
+//     LuX,
+// } from 'react-icons/lu'
+
+//  import { 
+//     Editable, 
+//     IconButton,
+// } from '@chakra-ui/react'
+
+import { ValueChangeDetails } from '@zag-js/editable'
+
 import { 
     IComments,
-    IPost, 
+    IPost,
+    // IPostContent, 
 } from '@/domain/models'
 
 import { 
@@ -19,7 +38,13 @@ import {
     PostHeader,
     PostContent,
     PostComment,
+    EditableField,
 } from '@/presentation/components'
+
+import {
+    Header, 
+    Section, 
+} from './styles'
 
 export default function Post(){
 
@@ -33,6 +58,10 @@ export default function Post(){
     ) return
     
     const posts: IPost[] = response.data
+    const mockUser = {
+        avatar: 'https://res.cloudinary.com/dqcweavkb/image/upload/c_pad,w_250,h_250/v1734624200/dev-animeedits__frame-image-1_d3yrfg.png',
+        username: 'john.doe'
+    } 
 
     function postHeader(post: IPost): React.ReactNode {
         return (
@@ -74,30 +103,70 @@ export default function Post(){
             </PostComment.Container>
         )
     }
+
+    function handleCommitBodyPost(details: ValueChangeDetails): void {
+        console.log('handleCommitPost...')
+        console.log(details)
+    }
     
     return (
         <>
-            {
-                posts.map(post => (
-                    <PostCard.Container 
-                        key={post.id}
-                    >
+            <Header>
+                <PostCard.Container>
+                    <PostCard.Header>
+                        <PostHeader.Container>
+                            <PostHeader.Avatar 
+                                imageSource={mockUser.avatar} 
+                                imageName={mockUser.username} 
+                            />
+                            <aside style={{ flexGrow: 1 }}>
+                                <EditableField
+                                    handlers={{ onSubmit: handleCommitBodyPost }} 
+                                    labelField='Comece a escrever sua publicação' 
+                                    fieldType='text'
+                                    triggers={{
+                                        edit: {
+                                            view: true,
+                                            button: null
+                                        },
+                                        cancel:{
+                                            view: true,
+                                            button: null 
+                                        },
+                                        submit: {
+                                            view: true,
+                                            button: null  
+                                        }
+                                    }} 
+                                />
+                            </aside>
+                        </PostHeader.Container>
+                    </PostCard.Header>
+                </PostCard.Container>
+            </Header>
+            <Section>
+                {
+                    posts.map(post => (
+                        <PostCard.Container 
+                            key={post.id}
+                        >
 
-                        <PostCard.Header>{ postHeader(post) }</PostCard.Header>
-                        <PostCard.Content 
-                            content={ postContent(post) }
-                            comment={
-                                post.comments && !!post.comments?.length ? 
-                                (
-                                    post.comments.map(comment => postComment(comment))
-                                ) : (
-                                    <PostComment.Content />
-                                )
-                            } 
-                        />
-                    </PostCard.Container>
-                ))
-            }
+                            <PostCard.Header divider={true}>{ postHeader(post) }</PostCard.Header>
+                            <PostCard.Content 
+                                content={ postContent(post) }
+                                comment={
+                                    post.comments && !!post.comments?.length ? 
+                                    (
+                                        post.comments.map(comment => postComment(comment))
+                                    ) : (
+                                        <PostComment.Content />
+                                    )
+                                } 
+                            />
+                        </PostCard.Container>
+                    ))
+                }
+            </Section>
         </>
     )
 }

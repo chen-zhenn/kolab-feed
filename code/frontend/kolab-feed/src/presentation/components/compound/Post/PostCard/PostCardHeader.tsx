@@ -3,9 +3,12 @@ import {
 } from '@chakra-ui/react'
 import { IPostCard } from './types'
 
-export default function PostCardHeader({ children }:  IPostCard) {
+export default function PostCardHeader({ 
+    children, 
+    divider, 
+}:  IPostCard) {
     return (
-        <Card.Header className='-header'>
+        <Card.Header className={ divider ? '-divider' : '' }>
             {children}
         </Card.Header>
     )

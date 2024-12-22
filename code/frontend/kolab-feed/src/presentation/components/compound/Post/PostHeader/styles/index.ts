@@ -7,6 +7,7 @@ const shared = () =>  `
 export const Container = styled.header`
     display: flex;
     align-items: center;
+    margin-bottom: 1.33rem;
 `
 
 export const Title = styled.h5`

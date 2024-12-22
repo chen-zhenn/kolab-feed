@@ -7,15 +7,15 @@ import {
 export const PostCardContainer = styled.article`
     margin: 0 auto;
     margin-bottom: 1.75rem;
-
-    .-header {
+    
+    .-divider {
         position: relative;
         &:after {
             content: '';
             position: absolute;
             display: block;
             left: 0;
-            bottom: -15px;
+            bottom: 0;
             width: 100%;
             height: 1px;
             background-color: rgba(228, 228, 231, 1);
