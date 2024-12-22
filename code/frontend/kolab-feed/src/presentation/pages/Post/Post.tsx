@@ -40,11 +40,11 @@ export default function Post(){
                 <PostHeader.Avatar 
                     imageSource={post?.users?.avatar} 
                     imageName={post?.users?.username}
-                    onClick={() => nav(`/post/${post.userId}`)} 
+                    onClick={() => nav(`/posts/${post.userId}`)} 
                 />
                 <PostHeader.Title 
                     title={post?.users?.username}
-                    onClick={() => nav(`/post/${post.userId}`)} 
+                    onClick={() => nav(`/posts/${post.userId}`)} 
                 />
                 <PostHeader.Action 
                     action={true} 

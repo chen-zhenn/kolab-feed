@@ -29,9 +29,7 @@ const router = createBrowserRouter([{
             loader: async () => post.getAll(),
             children: [{
             },{
-                path: 'post',
-            },{
-                path: 'post',
+                path: 'posts',
             },{
                 path: 'add',
             },{
@@ -40,7 +38,7 @@ const router = createBrowserRouter([{
                 path: 'delete',
             },]
         },{
-            path: '/post',
+            path: '/posts',
             element: <View.Pages.Post />,
             loader: async () => post.getAll(),
             children: [{
@@ -49,7 +47,7 @@ const router = createBrowserRouter([{
                 path: 'delete',
             }]
         },{
-            path: '/post/:userId',
+            path: '/posts/:userId',
             element: <View.Pages.Post />,
             loader: async ({ params }) => post.getAll({ ...params }),
             children: [{
