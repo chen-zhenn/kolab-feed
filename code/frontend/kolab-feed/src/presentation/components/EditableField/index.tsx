@@ -34,9 +34,9 @@ export function EditableField({
 
   function setTriggerButton(type: TriggerTypes): React.ReactElement {
     const buttons = {
-      edit: <IconButton variant="ghost" size="xs"><LuPencilLine /></IconButton>,
-      cancel: <IconButton variant="ghost" size="xs"><LuX /></IconButton>,
-      submit: <IconButton variant="ghost" size="xs"><LuCheck /></IconButton>,
+      edit: <IconButton variant='ghost' size='xs'><LuPencilLine /></IconButton>,
+      cancel: <IconButton variant='ghost' size='xs' color='white' backgroundColor='red.400'><LuX /></IconButton>,
+      submit: <IconButton variant='ghost' size='xs' color='white' backgroundColor='green.400'><LuCheck /></IconButton>,
     }
 
     return buttons[type ?? 'edit']
@@ -58,7 +58,7 @@ export function EditableField({
       onValueCommit={handlers?.onSubmit}
       onValueChange={handlers?.onChange}
     >
-      <Editable.Preview width="full" />
+      <Editable.Preview width='full' />
       {setField(fieldType)}
 
       <Editable.Control>
