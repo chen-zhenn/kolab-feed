@@ -5,6 +5,8 @@ import {
     BreadcrumbLink,
  } from '@/presentation/components'
 
+ import { Container } from './styles'
+
 export function BreadNav(){
 
     const { pathname } = useLocation()
@@ -26,19 +28,22 @@ export function BreadNav(){
     }
 
     return (
-        <BreadcrumbRoot size='lg'>
-            {
-                mount().map(item => (
-                    <BreadcrumbLink key={item.link}>
-                       <NavLink 
-                        to={item.navigable ? item.link : pathname}
-                        style={{ color: 'rgba(26, 32, 44, 1)' }}
-                    >
-                        {item.label}
-                    </NavLink>
-                    </BreadcrumbLink>
-                ))
-            }
-        </BreadcrumbRoot>
+        <Container>
+            <BreadcrumbRoot size='lg' >
+                {
+                    mount().map(item => (
+                        <BreadcrumbLink key={item.link}>
+                        <NavLink 
+                            to={item.navigable ? item.link : pathname}
+                            style={{ color: 'rgba(26, 32, 44, 1)' }}
+                        >
+                            {item.label}
+                        </NavLink>
+                        </BreadcrumbLink>
+                    ))
+                }
+            </BreadcrumbRoot>
+        </Container>
+
     )
 }

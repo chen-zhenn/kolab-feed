@@ -4,6 +4,9 @@ import {
     GridTemplate,  
 } from '../types'
 
+import { 
+    BreakPoints, 
+} from '@/presentation/theme'
 
 const shared = () => `
     background-color: rgba(255, 197, 32, 1);
@@ -13,42 +16,94 @@ export const Wrap = styled.div<{ grid: GridTemplate }>`
     position: relative;
     display: grid;
     grid-template-columns: ${(props) => setGridLayout(props.grid) };
-    width: 100%;
+    width: 100vw;
     min-height: 100vh;
-    transition: transform .33s ease;
+    transition: all .075s linear;
+    transform: translateX(0);
 
-    &.-full {
-        width: 138vw;
-        transform: translateX(-38.2vw);
+    &.-expanded {
+        width: 100vw;
+        transform: translateX(0);
     }
+     
+    @media(min-width: ${BreakPoints.large}) {
+        width: 100%;
+        transform: translateX(0);
+        
+        &.-expanded {
+            width: 138vw;
+            transform: translateX(-38.2vw);
+        }
+    }
+
+    @media(min-width: ${BreakPoints.xxxlarge}) {
+        max-width: 1440px;
+        margin: 0 auto;
+
+        &.-expanded {
+            width: 100%;
+            transform: unset;
+        }
+    }
+
 `
 
 export const Header = styled.header`
     ${shared}
     grid-row: 1;
-    grid-column: 2 / 3;
+    grid-column: 1 / 3;
     padding: 1.75rem;
+
+    @media(min-width: ${BreakPoints.large}) {
+        grid-column: 2 / 3;
+    }
 `
 
 export const Content = styled.main`
-    grid-row: 2;
-    grid-column: 2 / 3;
+    grid-row: 3;
+    grid-column: 1 / 3;
     padding: 1.75rem;
+
+    @media(min-width: ${BreakPoints.large}) {
+        grid-row: 2;
+        grid-column: 2 / 3;
+    }
 `
 
 export const Sidebar = styled.aside`
-    grid-row: 1 / 3;
-    grid-column: 1 / 2;
+    grid-row: 2;
+    grid-column: 1 / 3;
+    overflow: hidden;
+    height: 0;
+    text-align: center;
     color: rgba(255, 255, 255, 1);
     background-color: rgba(26, 32, 44, 1);
+
+    .-expanded & {
+        height: max-content;
+    }
+
+    @media(min-width: ${BreakPoints.large}) {
+        grid-row: 1 / 3;
+        grid-column: 1 / 2;
+        height: auto;
+
+        .-expanded & {
+            height: auto;
+        }
+    }
 
 `
 
 export const Footer = styled.footer`
     ${shared}
-    grid-row: 3;
+    grid-row: 4;
     grid-column: 1 / 3;
     text-align: center;
+
+    @media(min-width: ${BreakPoints.large}) {
+        grid-row: 3;
+    }
 `
 
 export const Generic = styled.div``

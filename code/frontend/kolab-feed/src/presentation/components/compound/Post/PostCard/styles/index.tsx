@@ -1,8 +1,11 @@
 import styled from 'styled-components'
 
+import { 
+    BreakPoints, 
+} from '@/presentation/theme'
+
 export const PostCardContainer = styled.article`
     margin: 0 auto;
-    max-width: 50vw;
     margin-bottom: 1.75rem;
 
     .-header {
@@ -17,6 +20,10 @@ export const PostCardContainer = styled.article`
             height: 1px;
             background-color: rgba(228, 228, 231, 1);
         }
+    }
+
+    @media(min-width: ${BreakPoints.large}) {
+        max-width: 50vw;
     }
 `
 export const ContentSection = styled.section`

@@ -6,11 +6,12 @@ import {
     Footer,
     Generic,
 } from './styles'
+import { memo } from 'react'
 
-export default function LayoutModule({  
+function LayoutModule({  
     type, 
     children,
-}: ILayout){
+}: ILayout ){
 
     const module = {
         header: <Header>{children}</Header>,
@@ -20,5 +21,7 @@ export default function LayoutModule({
         generic: <Generic>{children}</Generic>,
       }
 
-      return ( type ? module[type] : module['generic'] )
+      return ( module[type ?? 'generic'] )
 }
+
+export default memo(LayoutModule)
