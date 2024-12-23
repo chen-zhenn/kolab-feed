@@ -1,15 +1,16 @@
 import styled from 'styled-components'
 
 import { 
+    colors,
+    breakpoints, 
+} from '@/presentation/theme'
+
+import { 
     GridTemplate,  
 } from '../types'
 
-import { 
-    BreakPoints, 
-} from '@/presentation/theme'
-
 const shared = () => `
-    background-color: rgba(255, 197, 32, 1);
+    background-color: ${colors.primary};
 ` 
 
 export const Wrap = styled.div<{ grid: GridTemplate }>`
@@ -26,7 +27,7 @@ export const Wrap = styled.div<{ grid: GridTemplate }>`
         transform: translateX(0);
     }
      
-    @media(min-width: ${BreakPoints.large}) {
+    @media(min-width: ${breakpoints.medium}) {
         width: 100%;
         transform: translateX(0);
         
@@ -36,7 +37,7 @@ export const Wrap = styled.div<{ grid: GridTemplate }>`
         }
     }
 
-    @media(min-width: ${BreakPoints.xxxlarge}) {
+    @media(min-width: ${breakpoints.xxxlarge}) {
         max-width: 1440px;
         margin: 0 auto;
 
@@ -54,7 +55,7 @@ export const Header = styled.header`
     grid-column: 1 / 3;
     padding: 1.75rem;
 
-    @media(min-width: ${BreakPoints.large}) {
+    @media(min-width: ${breakpoints.medium}) {
         grid-column: 2 / 3;
     }
 `
@@ -64,7 +65,7 @@ export const Content = styled.main`
     grid-column: 1 / 3;
     padding: 1.75rem;
 
-    @media(min-width: ${BreakPoints.large}) {
+    @media(min-width: ${breakpoints.medium}) {
         grid-row: 2;
         grid-column: 2 / 3;
     }
@@ -76,14 +77,14 @@ export const Sidebar = styled.aside`
     overflow: hidden;
     height: 0;
     text-align: center;
-    color: rgba(255, 255, 255, 1);
-    background-color: rgba(26, 32, 44, 1);
+    color: ${colors.white};
+    background-color: ${colors.secondary};
 
     .-expanded & {
         height: max-content;
     }
 
-    @media(min-width: ${BreakPoints.large}) {
+    @media(min-width: ${breakpoints.medium}) {
         grid-row: 1 / 3;
         grid-column: 1 / 2;
         height: auto;
@@ -101,7 +102,7 @@ export const Footer = styled.footer`
     grid-column: 1 / 3;
     text-align: center;
 
-    @media(min-width: ${BreakPoints.large}) {
+    @media(min-width: ${breakpoints.medium}) {
         grid-row: 3;
     }
 `
