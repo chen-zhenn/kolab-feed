@@ -1,12 +1,13 @@
 import { 
-  createSystem, 
-  defaultBaseConfig, 
-  defineConfig, 
+  createSystem,
+  defaultConfig, 
+  defineConfig,
+  mergeConfigs 
 } from '@chakra-ui/react'
 
 const themeConfig = defineConfig({
-  // Global Styles...
   theme: {},
 })
 
-export const system = createSystem(defaultBaseConfig, themeConfig)
+const config = mergeConfigs(defaultConfig, themeConfig)
+export const system = createSystem(config)
