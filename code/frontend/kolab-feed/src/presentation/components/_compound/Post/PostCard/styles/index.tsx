@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 import { 
-    BreakPoints, 
+    breakpoints, 
 } from '@/presentation/theme'
 
 export const PostCardContainer = styled.article`
@@ -22,7 +22,7 @@ export const PostCardContainer = styled.article`
         }
     }
 
-    @media(min-width: ${BreakPoints.large}) {
+    @media(min-width: ${breakpoints.medium}) {
         max-width: 50vw;
     }
 `

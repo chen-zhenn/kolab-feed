@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 import { 
-    BreakPoints, 
+    breakpoints, 
 } from '@/presentation/theme'
 
 export const Container = styled.div`
@@ -17,7 +17,7 @@ export const Section = styled.section`
     &.-burger {
         cursor: pointer;
 
-        @media(min-width: ${BreakPoints.xxxlarge}) {
+        @media(min-width: ${breakpoints.xxxlarge}) {
             display: none;
         }
     }
