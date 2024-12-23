@@ -1,13 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ChakraUIProvider } from '@/presentation/providers/chakra-ui'
+import { UIProvider } from '@/presentation/providers/'
 import { Router } from '@/routes/'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ChakraUIProvider>
-      <Router />
-    </ChakraUIProvider>  
+    <UIProvider>
+        <Router />
+    </UIProvider>  
   </StrictMode>,
 )
