@@ -5,8 +5,12 @@ import {
   mergeConfigs 
 } from '@chakra-ui/react'
 
+import { breakpoints } from './breakpoints'
+
 const themeConfig = defineConfig({
-  theme: {},
+  theme: {
+    breakpoints,
+  },
 })
 
 const config = mergeConfigs(defaultConfig, themeConfig)
