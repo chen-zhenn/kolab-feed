@@ -6,7 +6,7 @@ type scrollBehavior = 'inside' | 'outside'
 
 export interface IHandlers {
     onExitComplete?: () => void;
-    onOpenChange: (details: DialogOpenChangeDetails) => void; 
+    onOpenChange?: (details: DialogOpenChangeDetails) => void
 }
 
 export interface IModal {

@@ -1,5 +1,8 @@
 import { IModal } from './types'
 
+import {  
+} from '@chakra-ui/react'
+
 import { 
     DialogFooter,
     DialogActionTrigger,
@@ -7,20 +10,20 @@ import {
 } from '@/presentation/components'
 
 export default function ModalFooter({
-    children, 
+    children,
 }: IModal){
     return (
         <DialogFooter>
+            {children}
             <DialogActionTrigger asChild>
                 <Button 
                     variant='outline'
                     color='white' 
-                    backgroundColor='blue.400'
+                    backgroundColor='blue.500'
                     >
-                        Cancel
+                        Cancelar
                 </Button>
             </DialogActionTrigger>
-            {children}
         </DialogFooter>
     )
 }
