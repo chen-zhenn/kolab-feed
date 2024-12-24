@@ -1,6 +1,6 @@
-export type ActionType = 'edit' | 'cancel' | 'confirm' | 'submit' | 'upload'
+ export type ActionType = 'edit' | 'cancel' | 'confirm' | 'submit' | 'upload'
 
-export interface IHandlers {
+ export interface IHandlers {
     onEdit?: () => void;
     onCancel?: () => void;
     onConfirm?: () => void;
@@ -19,6 +19,6 @@ export interface IBtn {
     children?: React.ReactNode; 
     actionType?: ActionType;
     state?: IState;
-    habdlers?: IHandlers;
+    handlers?: IHandlers;
     // size?:  
 }

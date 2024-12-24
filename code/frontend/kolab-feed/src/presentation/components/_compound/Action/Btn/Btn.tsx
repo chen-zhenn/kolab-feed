@@ -22,7 +22,7 @@ export default function Btn({
     label, 
     actionType,
     state,
-    habdlers,
+    handlers,
  }: IBtn){
     
     function setButton(type?: ActionType, handlers?: IHandlers): React.ReactElement {
@@ -182,6 +182,6 @@ export default function Btn({
     }
 
     return (
-        <>{setButton(actionType, habdlers)}</>
+        <>{setButton(actionType, handlers)}</>
     )
 }
