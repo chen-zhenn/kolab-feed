@@ -1,7 +1,4 @@
-import { 
-    // useEffect, 
-    // useState 
-} from 'react'
+import { useState } from 'react'
 
 import { 
     useLoaderData,
@@ -9,23 +6,12 @@ import {
     useLocation,
 } from 'react-router'
 
-// import { 
-//     LuCheck,
-//     LuPencilLine, 
-//     LuX,
-// } from 'react-icons/lu'
-
-//  import { 
-//     Editable, 
-//     IconButton,
-// } from '@chakra-ui/react'
-
 import { ValueChangeDetails } from '@zag-js/editable'
 
 import { 
     IComments,
     IPost,
-    // IPostContent, 
+    IPostData, 
 } from '@/domain/models'
 
 import { 
@@ -39,6 +25,8 @@ import {
     PostContent,
     PostComment,
     EditableField,
+    Modal,
+    Form,
 } from '@/presentation/components'
 
 import {
@@ -46,11 +34,23 @@ import {
     Section, 
 } from './styles'
 
+const mockUser = {
+    id: 1,
+    avatar: 'https://res.cloudinary.com/dqcweavkb/image/upload/c_pad,w_250,h_250/v1734624200/dev-animeedits__frame-image-1_d3yrfg.png',
+    username: 'john.doe'
+}
+
 export default function Post(){
 
     const nav = useNavigate()
     const { pathname } = useLocation()
     const response: IHttpResponse<IPost[]> = useLoaderData()
+    const [open, setOpen] = useState<boolean>(false)
+    const [postData, setpostData] = useState<IPostData>({
+        userId: mockUser.id,
+        title: '',
+        body: '',
+    })
     
     if (
         response.status !== HttpStatusCode.success || 
@@ -58,10 +58,7 @@ export default function Post(){
     ) return
     
     const posts: IPost[] = response.data
-    const mockUser = {
-        avatar: 'https://res.cloudinary.com/dqcweavkb/image/upload/c_pad,w_250,h_250/v1734624200/dev-animeedits__frame-image-1_d3yrfg.png',
-        username: 'john.doe'
-    } 
+
 
     function postHeader(post: IPost): React.ReactNode {
         return (
@@ -104,9 +101,14 @@ export default function Post(){
         )
     }
 
-    function handleCommitBodyPost(details: ValueChangeDetails): void {
+    function handleConfirmBodyPost(details: ValueChangeDetails): void {
         console.log('handleCommitPost...')
         console.log(details)
+        setpostData(prevData => ({
+            ...prevData,
+            body: details.value
+        }))
+        setOpen(true)
     }
     
     return (
@@ -121,7 +123,7 @@ export default function Post(){
                             />
                             <aside style={{ flexGrow: 1 }}>
                                 <EditableField
-                                    handlers={{ onSubmit: handleCommitBodyPost }} 
+                                    handlers={{ onConfirm: handleConfirmBodyPost }} 
                                     labelField='Comece a escrever sua publicação' 
                                     fieldType='text'
                                     triggers={{
@@ -133,7 +135,7 @@ export default function Post(){
                                             view: true,
                                             button: null 
                                         },
-                                        submit: {
+                                        confirm: {
                                             view: true,
                                             button: null  
                                         }
@@ -167,6 +169,24 @@ export default function Post(){
                     ))
                 }
             </Section>
+
+            <Modal.Container 
+                open={open}
+                closeOnInteractOutside={true}
+                handlers={{
+                    onOpenChange(details) { setOpen(details.open) },
+                }}
+            >
+                <Modal.Header>
+                    <Modal.Title title='Complete o Cadastro' />
+                </Modal.Header>
+                <Modal.Content>
+                    <Form.Post 
+                        data={postData}
+                        handlers={{ onCancel: () => setOpen(false) }} 
+                    />
+                </Modal.Content>
+            </Modal.Container>
         </>
     )
 }
