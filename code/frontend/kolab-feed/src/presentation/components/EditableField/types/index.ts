@@ -1,7 +1,7 @@
 import { ValueChangeDetails } from '@zag-js/editable'
 
 export type FieldTypes = 'input' | 'text'
-export type TriggerTypes = 'edit' | 'cancel' | 'submit'
+export type TriggerTypes = 'edit' | 'cancel' | 'confirm'
 export type Btn = React.ReactElement
 
 export interface ITriggerElement {
@@ -10,14 +10,14 @@ export interface ITriggerElement {
 }
 
 export interface IHandlers {
-    onSubmit?: (details: ValueChangeDetails) => void;
+    onConfirm?: (details: ValueChangeDetails) => void;
     onChange?: () => void;
 }
 
 export interface ITriggers {
     edit?: ITriggerElement;
     cancel?: ITriggerElement;
-    submit?: ITriggerElement;
+    confirm?: ITriggerElement;
 }
 
 export interface IEditableField {

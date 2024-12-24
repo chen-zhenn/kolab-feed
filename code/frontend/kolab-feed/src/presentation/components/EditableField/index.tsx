@@ -1,4 +1,3 @@
-import React from 'react'
 import { 
     LuCheck, 
     LuPencilLine, 
@@ -34,9 +33,74 @@ export function EditableField({
 
   function setTriggerButton(type: TriggerTypes): React.ReactElement {
     const buttons = {
-      edit: <IconButton variant='ghost' size='xs'><LuPencilLine /></IconButton>,
-      cancel: <IconButton variant='ghost' size='xs' color='white' backgroundColor='red.400'><LuX /></IconButton>,
-      submit: <IconButton variant='ghost' size='xs' color='white' backgroundColor='green.400'><LuCheck /></IconButton>,
+      edit: 
+        <IconButton 
+          variant='ghost' 
+          size='xs'
+          _hover={{
+            outlineWidth: '1px',
+            outlineColor:'transparent',
+            borderColor: 'transparent'
+          }}
+          _focus={{
+            outlineWidth: '1px',
+            outlineColor:'transparent',
+          }}
+          _focusVisible={{
+              outlineWidth: '1px',
+              outlineColor:'transparent',
+          }}
+        >
+          <LuPencilLine />
+        </IconButton>,
+      cancel: 
+        <IconButton 
+          variant='ghost' 
+          size='xs' 
+          color='white' 
+          backgroundColor='red.500'
+          _hover={{
+            outlineWidth: '1px',
+            outlineColor:'transparent',
+            borderColor: 'red.500',
+            color: 'red.700',
+            fontWeight: '700'
+          }}
+          _focus={{
+            outlineWidth: '1px',
+            outlineColor:'transparent',
+          }}
+          _focusVisible={{
+              outlineWidth: '1px',
+              outlineColor:'transparent',
+          }}
+          >
+            <LuX />
+          </IconButton>,
+      confirm: 
+        <IconButton 
+          variant='ghost' 
+          size='xs' 
+          color='white' 
+          backgroundColor='green.500'
+          _hover={{
+            outlineWidth: '1px',
+            outlineColor:'transparent',
+            borderColor: 'green.500',
+            color: 'green.700',
+            fontWeight: '700'
+          }}
+          _focus={{
+            outlineWidth: '1px',
+            outlineColor:'transparent',
+          }}
+          _focusVisible={{
+              outlineWidth: '1px',
+              outlineColor:'transparent',
+          }}
+        >
+          <LuCheck />
+        </IconButton>,
     }
 
     return buttons[type ?? 'edit']
@@ -46,7 +110,7 @@ export function EditableField({
     const triggers = {
       edit: <Editable.EditTrigger asChild>{btn ?? setTriggerButton('edit')}</Editable.EditTrigger>,
       cancel: <Editable.CancelTrigger asChild>{btn ?? setTriggerButton('cancel')}</Editable.CancelTrigger>,
-      submit: <Editable.SubmitTrigger asChild>{btn ?? setTriggerButton('submit')}</Editable.SubmitTrigger>,
+      confirm: <Editable.SubmitTrigger asChild>{btn ?? setTriggerButton('confirm')}</Editable.SubmitTrigger>,
     }
 
     return triggers[type ?? 'edit']
@@ -55,7 +119,7 @@ export function EditableField({
   return (
     <Editable.Root
       defaultValue={labelField}
-      onValueCommit={handlers?.onSubmit}
+      onValueCommit={handlers?.onConfirm}
       onValueChange={handlers?.onChange}
     >
       <Editable.Preview width='full' />
@@ -64,7 +128,7 @@ export function EditableField({
       <Editable.Control>
         {triggers.edit?.view && setTrigger('edit', triggers.edit.button)}
         {triggers.cancel?.view && setTrigger('cancel', triggers.cancel.button)}
-        {triggers.submit?.view && setTrigger('submit', triggers.submit.button)}
+        {triggers.confirm?.view && setTrigger('confirm', triggers.confirm.button)}
       </Editable.Control>
     </Editable.Root>
   )
