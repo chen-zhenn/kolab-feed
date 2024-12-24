@@ -1,8 +1,7 @@
 import { 
     Fieldset,
-    Textarea,
-    Input,
     Flex,
+    Show,
 } from '@chakra-ui/react'
 
 import { 
@@ -14,8 +13,8 @@ import {
 } from '@/domain/models'
 
 import { 
-    Field,
     Action,
+    FormControl,
 } from '@/presentation/components'
 
 import { IFormPost } from './types'
@@ -33,11 +32,6 @@ export function FormPost({
         defaultValues: data,
     })
 
-    function handleUpLoadFile(details: FileAcceptDetails): void {
-        console.log('handleUpLoadFile...')
-        console.log(details)
-    }
-
     function onSubmit(data: IPostData): void {
         console.log('onSubmit...')
         console.log(data)
@@ -47,65 +41,43 @@ export function FormPost({
         <form onSubmit={handleSubmit(onSubmit)}>
             <Fieldset.Root>
 
-                <Fieldset.Legend>
-                    Dados de publicação
-                </Fieldset.Legend>
-
                 <Fieldset.HelperText>
                     Forneça detalhes de publicação 
                     conforme campos abaixo.
                 </Fieldset.HelperText>
 
                 <Fieldset.Content>
-                    <Field 
-                        label='Título'  
-                        invalid={!!errors.title}
+
+                    <FormControl.Input
+                        label='Título' 
+                        placeholder='Escreva o título da publicação'
                         errorText={errors.title?.message}
-                    >
-                        <Input
-                            placeholder='Escreva o título do publicação'
-                            { ...register(
-                                'title', 
-                                { required: 'Campo deve ser preenchido' }) 
-                            }
-                        />
-                    </Field>
+                        status={{ invalid: !!errors.title, }}
+                        {...register('title', { required: 'Campo deve ser preenchido!' })}
+                    />
 
-                    <Field 
-                        label='Conteúdo'
-                        invalid={!!errors.body}
+                    <FormControl.Textarea
+                        label='Conteúdo' 
+                        placeholder='Escreva o conteúdo da publicação'
                         errorText={errors.body?.message}
-                    >
-                        <Textarea
-                            placeholder='Conteúdo'
-                            { 
-                                ...register('body', 
-                                    { required: 'Campo deve ser preenchido' })
-                            } 
-                        />
-                    </Field>
+                        status={{ invalid: !!errors.body }}
+                        {...register('body', { required: 'Campo deve ser preenchido!' })}
+                    />
 
-                    <Field label='Imagem'>
-                        <Action.Btn
-                            actionType='upload'
-                            state={{ 
-                                disabled: false,
-                                loading: false, 
-                            }} 
-                            handlers={{ 
-                                onUpload: handleUpLoadFile  
-                            }} 
-                        />
-                    </Field>
+                    <FormControl.InputFile
+                        label='Imagem'
+                        placeholder='Carregar arquivo'
+                        {...register('image')}
+                    />
 
                     <Flex gap='1rem' justifyContent='flex-end'>
-                        <Action.Btn 
-                            actionType='submit' 
-                            state={{ 
-                                disabled: false,
-                                loading: false, 
-                            }} 
-                        />
+                            <Action.Btn 
+                                actionType='submit' 
+                                state={{ 
+                                    disabled: !!Object.keys(errors).length,
+                                    loading: false, 
+                                }} 
+                            />
                         <Action.Btn
                             actionType='cancel'
                             state={{ 
