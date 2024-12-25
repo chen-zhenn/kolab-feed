@@ -16,6 +16,7 @@ export interface IState {
 
 export interface IBtn {
     label?: string;
+    loadingLabel?: string;
     children?: React.ReactNode; 
     actionType?: ActionType;
     state?: IState;

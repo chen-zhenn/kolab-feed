@@ -1,3 +1,7 @@
+export interface IHandlers {
+    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
 export interface IStatus {
     invalid?: boolean; 
     required?: boolean;
@@ -9,4 +13,5 @@ export interface IInput extends Omit<React.InputHTMLAttributes<HTMLInputElement>
     label?: string;
     errorText?: string;
     status?: IStatus;
+    handlers?: IHandlers;
 }

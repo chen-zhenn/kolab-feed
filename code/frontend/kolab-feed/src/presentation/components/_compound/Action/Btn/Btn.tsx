@@ -19,7 +19,8 @@ import {
 } from './types'
 
 export default function Btn({
-    label, 
+    label,
+    loadingLabel, 
     actionType,
     state,
     handlers,
@@ -105,6 +106,8 @@ export default function Btn({
                     color='white' 
                     backgroundColor='green.500'
                     disabled={state?.disabled}
+                    loading={state?.loading}
+                    loadingText={loadingLabel}
                     _hover={{
                         outlineColor:'transparent',
                         borderColor: 'transparent',

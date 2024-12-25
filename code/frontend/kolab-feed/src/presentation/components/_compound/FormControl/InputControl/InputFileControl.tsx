@@ -29,8 +29,9 @@ const InputFileControl = forwardRef<HTMLInputElement, IInput>(({
 
         return <Input
             type='file'
-            {...props} 
+            {...props}
             ref={ref as React.Ref<HTMLInputElement>}   
+            onChange={props?.handlers?.onChange} 
             />
     }
 
