@@ -16,7 +16,7 @@ const shared = () => `
 export const Wrap = styled.div<{ grid: GridTemplate }>`
     position: relative;
     display: grid;
-    grid-template-columns: ${(props) => setGridLayout(props.grid) };
+    ${(props) => setGridLayout(props.grid)};
     width: 100vw;
     min-height: 100vh;
     transition: all .075s linear;
@@ -36,23 +36,13 @@ export const Wrap = styled.div<{ grid: GridTemplate }>`
             transform: translateX(-38.2vw);
         }
     }
-
-    @media(min-width: ${breakpoints.xxxlarge}) {
-        max-width: 1440px;
-        margin: 0 auto;
-
-        &.-expanded {
-            width: 100%;
-            transform: unset;
-        }
-    }
-
 `
 
 export const Header = styled.header`
     ${shared}
     grid-row: 1;
     grid-column: 1 / 3;
+    height: fit-content;
     padding: 1.75rem;
 
     @media(min-width: ${breakpoints.medium}) {
@@ -107,13 +97,46 @@ export const Footer = styled.footer`
     }
 `
 
+export const Container = styled.div`
+
+    @media(min-width: ${breakpoints.xxxlarge}) {
+        max-width: 1440px;
+        margin: 0 auto;
+
+        .-expanded & {
+            max-width: none;
+            margin-right: auto;
+            margin-left: calc((138vw - 100vw) / 2);
+        }
+    }
+`
+
 export const Generic = styled.div``
 
 function setGridLayout(grid?: GridTemplate): string {
+
+
+    const goldenRatio = `
+        grid-template-rows: repeat(2, max-content) 1fr max-content;
+        grid-template-columns: 0.382fr 1fr;
+
+        @media (min-width: ${breakpoints.medium}) and (orientation: landscape) {
+            grid-template-rows: max-content 1fr max-content;
+        }
+
+        @media(min-width: ${breakpoints.xlarge}) {
+            grid-template-rows: max-content 1fr max-content;
+        }
+
+        @media(min-width: ${breakpoints.xxlarge}) {
+            grid-template-columns: 382px 1fr;
+        }
+    `
+
     const template = {
-        'default': 'repeat(auto-fit, minmax(320px, 1fr))',
-        'golden-ratio': '0.382fr 1fr',
-        'split-screen': '.7fr 1fr',
+        'default': 'grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))',
+        'golden-ratio': goldenRatio,
+        'split-screen': 'grid-template-columns: .7fr 1fr',
     }
     return grid ? template[grid] : template['default']
 }
