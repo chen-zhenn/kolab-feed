@@ -8,7 +8,7 @@ export interface IHttpResponse<T> {
     status: number;
     statusText: string;
     message: string;
-    data: T;
+    data?: T;
 }
 
 export interface IHttpClient<T, Q> {
@@ -19,6 +19,7 @@ export enum HttpStatusCode {
     success = 200,
     created = 201,
     badrequest = 400,
+    unauthorized = 401,
     notfound = 404,
     servererror = 500,
 }

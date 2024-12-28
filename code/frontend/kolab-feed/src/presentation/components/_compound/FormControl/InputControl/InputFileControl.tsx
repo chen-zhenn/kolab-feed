@@ -30,6 +30,7 @@ const InputFileControl = forwardRef<HTMLInputElement, IInput>(({
         return <Input
             type='file'
             {...props}
+            disabled={props?.status?.disabled}
             ref={ref as React.Ref<HTMLInputElement>}   
             onChange={props?.handlers?.onChange} 
             />
@@ -39,8 +40,8 @@ const InputFileControl = forwardRef<HTMLInputElement, IInput>(({
         <Wrap>
             <Label>{label}</Label>
             <Field>
-                {renderInput(props)}
-                <Placeholder htmlFor='file'>
+                {renderInput({ ...props, status })}
+                <Placeholder htmlFor='file' disabled={status?.disabled}>
                     {props.placeholder}
                     <LuUpload />
                 </Placeholder>

@@ -21,6 +21,7 @@ export const Wrap = styled.div<{ grid: GridTemplate }>`
     min-height: 100vh;
     transition: all .075s linear;
     transform: translateX(0);
+    background-color: var(--chakra-colors-gray-50);
 
     &.-expanded {
         width: 100vw;

@@ -1,2 +1,4 @@
+export * from './UseCaseUser'
 export * from './UseCasePost'
-export * from './UseCaseGetAllPost'
+export * from './UserFactories'
+export * from './PostFactories'

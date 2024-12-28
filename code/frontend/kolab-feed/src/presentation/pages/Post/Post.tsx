@@ -4,7 +4,12 @@ import {
     useLoaderData,
     useNavigate,
     useLocation,
+    useParams,
 } from 'react-router'
+
+import { 
+    Flex,
+} from '@chakra-ui/react'
 
 import { ValueChangeDetails } from '@zag-js/editable'
 
@@ -19,69 +24,84 @@ import {
     HttpStatusCode,
 } from '@/infra'
 
+import { HttpStatusMessages } from '@/main/services'
+
+import { makePost } from '@/main/usecases'
+import { Utils } from '@/presentation/shared'
+
 import { 
-    PostCard,
     PostHeader,
     PostContent,
     PostComment,
-    EditableField,
     Modal,
     Form,
+    Toaster,
+    Action,
 } from '@/presentation/components'
 
-import {
-    Header, 
-    Section, 
-} from './styles'
-
-const mockUser = {
-    id: 1,
-    avatar: 'https://res.cloudinary.com/dqcweavkb/image/upload/c_pad,w_250,h_250/v1734624200/dev-animeedits__frame-image-1_d3yrfg.png',
-    username: 'john.doe'
-}
+import { Partial } from './Partials'
+import { CrudAction } from './types'
 
 export default function Post(){
 
     const nav = useNavigate()
     const { pathname } = useLocation()
-    const response: IHttpResponse<IPost[]> = useLoaderData()
+    const { id: post_id } = useParams()
     const [open, setOpen] = useState<boolean>(false)
-    const [postData, setpostData] = useState<IPostData>({
-        userId: mockUser.id,
-        title: '',
-        body: '',
+    const [loading, setLoading] = useState<boolean>(false)
+    const [action, setAction] = useState<CrudAction>('add')
+    const [modalOptions, setModalOptions] = useState<{ title: string }>({
+        title: 'Complete o Cadastro'
     })
-    
-    if (
-        response.status !== HttpStatusCode.success || 
-        !response.data.length
-    ) return
-    
-    const posts: IPost[] = response.data
+    const [postData, setPostData] = useState<IPostData>({
+        title: '',
+        body: 'Comece a escrever sua publicação',
+        image: ''
+    })
 
+    const { launchToast } = Utils
+    let posts: IPost[] = []
 
-    function postHeader(post: IPost): React.ReactNode {
+    try {
+        const response: IHttpResponse<IPost[]> = useLoaderData()
+        if(response && response.status === 200) posts = response?.data ?? []
+    } catch (error) {
+        const response = {
+            status: HttpStatusCode.servererror,
+            statusText: 'error',
+            message: HttpStatusMessages.servererror,
+        }
+        return launchToast(response)
+    }
+
+    function handlePostHeaderBody(post: IPost): React.ReactNode {
+        let user = {} as { username?: string, avatar?: string }
+        if(post && post.users) {
+            const data = post.users.filter(user => user.post_id === post.id) 
+            if(data.length) user = data[0]
+        }
+
         return (
             <PostHeader.Container>
                 <PostHeader.Avatar 
-                    imageSource={post?.users?.avatar} 
-                    imageName={post?.users?.username}
-                    onClick={() => nav(`/posts/${post.userId}`)} 
+                    imageSource={user?.avatar} 
+                    imageName={user?.username}
+                    onClick={() => nav(`/posts/${post.id}`)} 
                 />
                 <PostHeader.Title 
-                    title={post?.users?.username}
-                    onClick={() => nav(`/posts/${post.userId}`)} 
+                    title={user?.username}
+                    onClick={() => nav(`/posts/${post.id}`)} 
                 />
                 <PostHeader.Action 
                     action={true} 
-                    handleEdit={() => nav(`${pathname.replace(/\/delete|\/edit$/, '')}/edit`)}
-                    handleDelete={() => nav(`${pathname.replace(/\/delete|\/edit$/, '')}/delete`)}  
+                    handleEdit={() => handleUpdatePost(post)}
+                    handleDelete={() => handleDeletePost(post)}  
                 />
             </PostHeader.Container>
         )
     }
 
-    function postContent(post: IPost): React.ReactNode {
+    function handlePostContentBody(post: IPost): React.ReactNode {
         return (
             <PostContent.Container>
                 <PostContent.Title title={post.title} />
@@ -91,102 +111,162 @@ export default function Post(){
         )
     }
 
-    function postComment(comment: IComments): React.ReactNode {
-        const post = posts.filter(item => item.userId === comment.userId)[0]
+    function handlePostCommentBody(comment: IComments): React.ReactNode {
+        const post = posts.filter(item => item.user_id === comment.user_id)[0]
         return (
             <PostComment.Container key={comment.id}>
-                <PostComment.Header>{  postHeader(post) }</PostComment.Header>
+                <PostComment.Header>{  handlePostHeaderBody(post) }</PostComment.Header>
                 <PostComment.Content contentValue={comment.body} />
             </PostComment.Container>
         )
     }
 
+    function handleModalContentBody(action: CrudAction): React.ReactNode {
+        const content = {
+            add: (
+                <Form.Post 
+                    data={postData}
+                    handlers={{ onCancel: () => setOpen(false) }} 
+                />
+            ),
+            edit: (
+                <Form.Post 
+                    data={postData}
+                    handlers={{ onCancel: () => setOpen(false) }} 
+                />
+            ),
+            delete: (
+                <Flex gap='1rem' justifyContent='center'>
+                    <Action.Btn 
+                        actionType='confirm'
+                        label='Confirmar'
+                        loadingLabel='Deletando'
+                        state={{ 
+                            disabled: loading,
+                            loading: loading,
+                        }}  
+                        handlers={{ 
+                            onConfirm: async () => await handleConfirmDeletePost() 
+                        }} 
+                    />
+
+                    <Action.Btn 
+                        actionType='cancel'
+                        state={{ 
+                            disabled: loading,
+                        }}  
+                        handlers={{ 
+                            onCancel: () => setOpen(false) 
+                        }} 
+                    />
+                </Flex>
+            )
+        }
+
+        return content[action ?? 'add']
+    }
+
     function handleConfirmBodyPost(details: ValueChangeDetails): void {
-        console.log('handleCommitPost...')
-        console.log(details)
-        setpostData(prevData => ({
+        nav(`${pathname.replace(/\/(add|edit|delete)\/?\d*/, '')}/add`)
+        setPostData(prevData => ({
             ...prevData,
             body: details.value
         }))
+        setAction('add')
         setOpen(true)
+    }
+
+    function handleUpdatePost(post: IPost): void {
+        nav(`${pathname.replace(/\/(add|edit|delete)\/?\d*/, '')}/edit/${post.id}`)
+        const { title, body, image   } = post
+        setPostData(prevData => ({
+            ...prevData,
+            title,
+            body,
+            image,
+        }))
+        setAction('edit')
+        setOpen(true)
+    }
+
+    function handleDeletePost(post: IPost): void {
+        nav(`${pathname.replace(/\/(add|edit|delete)\/?\d*/, '')}/delete/${post.id}`)
+        setAction('delete')
+        setModalOptions({ title: 'Deletar Post?' })
+        setOpen(true)
+    }
+
+    async function handleConfirmDeletePost(): Promise<IHttpResponse<IPostData[]> | any> {
+        const post = makePost()
+        setLoading(true)
+
+        try {
+            const response = await post.delete({ id: post_id })
+            if(response) {
+                launchToast(response)
+                return response
+            }   
+        } catch (error) {
+            const response = {
+                status: HttpStatusCode.servererror,
+                statusText: 'error',
+                message: HttpStatusMessages.servererror,
+            }
+            return launchToast(response)
+        } finally {
+            setLoading(false)
+            setOpen(false)
+            setModalOptions({ title: 'Complete o Cadastro' })
+        } 
     }
     
     return (
         <>
-            <Header>
-                <PostCard.Container>
-                    <PostCard.Header>
-                        <PostHeader.Container>
-                            <PostHeader.Avatar 
-                                imageSource={mockUser.avatar} 
-                                imageName={mockUser.username} 
-                            />
-                            <aside style={{ flexGrow: 1 }}>
-                                <EditableField
-                                    handlers={{ onConfirm: handleConfirmBodyPost }} 
-                                    labelField='Comece a escrever sua publicação' 
-                                    fieldType='text'
-                                    triggers={{
-                                        edit: {
-                                            view: true,
-                                            button: null
-                                        },
-                                        cancel:{
-                                            view: true,
-                                            button: null 
-                                        },
-                                        confirm: {
-                                            view: true,
-                                            button: null  
-                                        }
-                                    }} 
-                                />
-                            </aside>
-                        </PostHeader.Container>
-                    </PostCard.Header>
-                </PostCard.Container>
-            </Header>
-            <Section>
-                {
-                    posts.map(post => (
-                        <PostCard.Container 
-                            key={post.id}
-                        >
+             <Partial.PostHeader
+                data={posts}
+                postData={postData} 
+                handlers={{ 
+                    handlePostHeaderBody,
+                    handlePostContentBody,
+                    handlePostCommentBody,
+                    handleConfirmBodyPost 
+                }} 
+            />
 
-                            <PostCard.Header divider={true}>{ postHeader(post) }</PostCard.Header>
-                            <PostCard.Content 
-                                content={ postContent(post) }
-                                comment={
-                                    post.comments && !!post.comments?.length ? 
-                                    (
-                                        post.comments.map(comment => postComment(comment))
-                                    ) : (
-                                        <PostComment.Content />
-                                    )
-                                } 
-                            />
-                        </PostCard.Container>
-                    ))
-                }
-            </Section>
+            {
+                !!posts.length && (
+                    <Partial.PostBody
+                    data={posts}
+                    handlers={{
+                        handlePostHeaderBody,
+                        handlePostContentBody,
+                        handlePostCommentBody,
+                        handleConfirmBodyPost
+                    }} 
+                />
+                )
+            }
 
             <Modal.Container 
                 open={open}
                 closeOnInteractOutside={true}
+                scrollBehavior='inside'
                 handlers={{
-                    onOpenChange(details) { setOpen(details.open) },
+                    onOpenChange: (details) => setOpen(details.open),
+                    onExitComplete: () => {
+                        nav(`${pathname.replace(/\/(add|edit|delete)\/?\d*/, '')}`)
+                        setPostData({ title: '', body: '', image: '' })
+                    }
                 }}
             >
                 <Modal.Header>
-                    <Modal.Title title='Complete o Cadastro' />
+                    <Modal.Title title={modalOptions.title} />
                 </Modal.Header>
                 <Modal.Content>
-                    <Form.Post 
-                        data={postData}
-                        handlers={{ onCancel: () => setOpen(false) }} 
-                    />
+                    {handleModalContentBody(action)}
                 </Modal.Content>
             </Modal.Container>
+            <Toaster />            
         </>
     )
 }

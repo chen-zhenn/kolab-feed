@@ -2,15 +2,17 @@ import { IComments } from './Comments'
 import { IUsers } from './User'
 
 export interface IPostData {
-    userId: number;
+    id?: number;
     title: string;
     body: string;
-    created_at?: string;
-    image?: string;
+    imageFile?: File;
+    image?: string
 }
 
 export interface IPost extends IPostData {
     id: number;
-    users?: IUsers;
+    user_id: string;
+    users: IUsers[];
+    created_at: string;
     comments?: IComments[];
 }

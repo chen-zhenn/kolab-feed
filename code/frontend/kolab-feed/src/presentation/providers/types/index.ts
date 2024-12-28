@@ -1,3 +1,3 @@
-export interface IUIProvider {
+export interface IProvider {
     children: React.ReactNode;
 }

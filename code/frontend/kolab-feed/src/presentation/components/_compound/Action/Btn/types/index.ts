@@ -5,7 +5,7 @@
     onCancel?: () => void;
     onConfirm?: () => void;
     onSubmit?: () => void;
-    onclick?: () => void;
+    onclick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     onUpload?: (details: FileAcceptDetails) => void;
 }
 

@@ -1,18 +1,14 @@
 import { Outlet } from 'react-router'
 import { Layout } from '@/presentation/layout'
+import {  Hero }  from '@/presentation/components'
 
-// import { 
-//   Header,
-//   Sidebar, 
-// }  from '@/presentation/partials'
-
-function Auth() {
+function PublicView() {
 
   return (
     <Layout.Wrap grid='split-screen'>
 
       <Layout.Module>
-        Block A
+        <Hero />
       </Layout.Module>
 
       <Layout.Module>
@@ -23,4 +19,4 @@ function Auth() {
   )
 }
 
-export default Auth
+export default PublicView

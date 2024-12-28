@@ -1,6 +1,7 @@
-import { View } from '@/presentation'
+import { 
+    Post, 
+} from '@/presentation/pages'
 
-// 'Hoje' Feed é apenas uma view de Posts
 export default function Feed(){
-    return ( <View.Pages.Post />)
+    return (<Post />)
 }
