@@ -1,7 +1,7 @@
 export interface IComments {
-    id: number;
-    userId: number;
-    postId: number;
+    id: string;
+    user_id: string;
+    post_id: string;
     body: string;
     created_at?: string;
 }

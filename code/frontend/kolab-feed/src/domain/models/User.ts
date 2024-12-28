@@ -1,9 +1,10 @@
-export interface IUsers {
+import { IAuth } from './Auth'
+
+export interface IUsers extends IAuth {
     id: number;
-    name: string;
+    post_id: number;
+    user_id: string;
     username: string;
-    email: string;
     avatar?: string;
-    password?: string;
     created_at?: string;
 }

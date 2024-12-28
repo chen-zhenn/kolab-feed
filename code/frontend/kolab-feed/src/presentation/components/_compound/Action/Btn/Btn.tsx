@@ -19,10 +19,11 @@ import {
 } from './types'
 
 export default function Btn({
-    label, 
+    label,
+    loadingLabel, 
     actionType,
     state,
-    habdlers,
+    handlers,
  }: IBtn){
     
     function setButton(type?: ActionType, handlers?: IHandlers): React.ReactElement {
@@ -51,9 +52,14 @@ export default function Btn({
           cancel: 
             <Button 
                 variant='outline'  
-                color='white' 
-                backgroundColor='red.500'
+                color={state?.disabled ? 'gray.500' : 'white'} 
+                backgroundColor={state?.disabled ? 'gray.300' : 'red.500'}
+                borderColor={state?.disabled ? 'gray.300' : 'red.500'}
                 disabled={state?.disabled}
+                cursor={state?.disabled ? 'disabled' : 'pointer'}
+                _disabled={{
+                    borderColor: 'transparent',
+                }}
                 _hover={{
                     outlineColor:'transparent',
                     borderColor: 'transparent',
@@ -76,8 +82,16 @@ export default function Btn({
           confirm: 
             <Button 
                 variant='outline' 
-                color='white' 
-                backgroundColor='green.500'
+                color={state?.disabled ? 'gray.500' : 'white'} 
+                backgroundColor={state?.disabled ? 'gray.300' : 'green.500'}
+                borderColor={state?.disabled ? 'gray.300' : 'green.500'}
+                cursor={state?.disabled ? 'disabled' : 'pointer'}
+                disabled={state?.disabled}
+                loading={state?.loading}
+                loadingText={loadingLabel}
+                _disabled={{
+                    borderColor: 'transparent',
+                }}
                 _hover={{
                     outlineWidth: '1px',
                     outlineColor:'transparent',
@@ -102,9 +116,16 @@ export default function Btn({
                 <Button
                     type='submit' 
                     variant='outline'
-                    color='white' 
-                    backgroundColor='green.500'
+                    color={state?.disabled ? 'gray.500' : 'white'} 
+                    backgroundColor={state?.disabled ? 'gray.300' : 'green.500'}
+                    borderColor={state?.disabled ? 'gray.300' : 'green.500'}
+                    cursor={state?.disabled ? 'disabled' : 'pointer'}
                     disabled={state?.disabled}
+                    loading={state?.loading}
+                    loadingText={loadingLabel}
+                    _disabled={{
+                        borderColor: 'transparent',
+                    }}
                     _hover={{
                         outlineColor:'transparent',
                         borderColor: 'transparent',
@@ -114,6 +135,7 @@ export default function Btn({
                       _focus={{
                         outlineWidth: '1px',
                         outlineColor:'transparent',
+                        borderColor: 'transparent',
                     }}
                       _focusVisible={{
                           outlineWidth: '1px',
@@ -182,6 +204,6 @@ export default function Btn({
     }
 
     return (
-        <>{setButton(actionType, habdlers)}</>
+        <>{setButton(actionType, handlers)}</>
     )
 }

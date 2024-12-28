@@ -1,19 +1,40 @@
-import { useState } from 'react'
+import { 
+    useState,
+} from 'react'
+
+import { 
+    useParams,
+} from 'react-router'
 
 import { 
     Fieldset,
-    Textarea,
-    Input,
+    Image,
     Flex,
+    Show,
 } from '@chakra-ui/react'
+
+import { 
+    useForm, 
+} from 'react-hook-form'
 
 import { 
     IPostData, 
 } from '@/domain/models'
 
+import {
+    IHttpResponse, 
+    HttpStatusCode,
+} from '@/infra'
+
+import { HttpStatusMessages } from '@/main/services'
+
+import { makePost } from '@/main/usecases'
+
+import { Utils } from '@/presentation/shared'
+
 import { 
-    Field,
     Action,
+    FormControl,
 } from '@/presentation/components'
 
 import { IFormPost } from './types'
@@ -23,30 +44,61 @@ export function FormPost({
     handlers 
 }: IFormPost){
 
-    const [postData, setpostData] = useState<IPostData>({
-        userId: data.userId,
-        title: data.title ?? '',
-        body: data.body ?? '',
+    const { id: post_id } = useParams()
+
+    const { 
+        register,
+        reset, 
+        handleSubmit,
+        formState: { errors }, 
+    } = useForm<IPostData>({
+        defaultValues: data,
+        mode: 'onChange',
     })
 
-    function handleUpLoadFile(details: FileAcceptDetails): void {
-        console.log('handleUpLoadFile...')
-        console.log(details)
+    const post = makePost()
+    const [imagePreview, setImagePreview] = useState<string>(data.image ?? '')
+    const [imageFile, setImageFile] = useState<File>()
+    const [loading, setLoading] = useState<boolean>(false)
+    const { launchToast } = Utils
+    
+    function handleFileChange(event: React.ChangeEvent<HTMLInputElement>): void {
+        if (!event.target.files) return
+        const file = event.target.files?.[0]
+        setImageFile(file)
+        const reader = new FileReader()
+        reader.onloadend = () => setImagePreview(reader.result as string)
+        reader.readAsDataURL(file)
     }
 
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
-        console.log('handleSubmit...')
-        event.preventDefault()
-        console.log(postData)
+    async function onSubmit(data: IPostData): Promise<IHttpResponse<IPostData[]> | any> {
+        const payload = {...data, imageFile }
+        if(post_id) payload.id = parseInt(post_id)
+        setLoading(true)   
+
+        try {
+            const response = await post.create(payload)
+            if(response) {
+                launchToast(response)
+                return response
+            }   
+        } catch (error) {
+            const response = {
+                status: HttpStatusCode.servererror,
+                statusText: 'error',
+                message: HttpStatusMessages.servererror,
+            }
+            return launchToast(response)
+        } finally {
+            setImagePreview('')
+            reset()
+            setLoading(false)
+        }
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <Fieldset.Root>
-
-                <Fieldset.Legend>
-                    Dados de publicação
-                </Fieldset.Legend>
 
                 <Fieldset.HelperText>
                     Forneça detalhes de publicação 
@@ -54,65 +106,53 @@ export function FormPost({
                 </Fieldset.HelperText>
 
                 <Fieldset.Content>
-                    <Field 
+
+                    <FormControl.Input
                         label='Título' 
-                        required 
-                        invalid={!postData.title}
-                        errorText='Campo deve ser preenchido'
-                    >
-                        <Input
-                            name='title' 
-                            placeholder='Escreva o título do publicação'
-                            value={postData.title}
-                            onChange={(e) => setpostData({ ...postData, title: e.target.value })}
-                        />
-                    </Field>
+                        placeholder='Escreva o título da publicação'
+                        errorText={errors.title?.message}
+                        status={{ invalid: !!errors.title, disabled: loading }}
+                        {...register('title', { required: 'Campo deve ser preenchido!' })}
+                    />
 
-                    <Field 
+                    <FormControl.Textarea
                         label='Conteúdo' 
-                        required
-                        invalid={!postData.body}
-                        errorText='Campo deve ser preenchido'
-                    >
-                        <Textarea
-                            name='body'
-                            placeholder='Conteúdo'
-                            value={postData.body}
-                            onChange={(e) => setpostData({ ...postData, body: e.target.value })} 
-                        />
-                    </Field>
+                        placeholder='Escreva o conteúdo da publicação'
+                        errorText={errors.body?.message}
+                        status={{ invalid: !!errors.body, disabled: loading }}
+                        {...register('body', { required: 'Campo deve ser preenchido!' })}
+                    />
 
-                    <Field label='Imagem'>
-                        <Action.Btn
-                            actionType='upload'
-                            state={{ 
-                                disabled: false,
-                                loading: false, 
-                            }} 
-                            habdlers={{ 
-                                onUpload: handleUpLoadFile  
-                            }} 
-                        />
-                    </Field>
+                    <FormControl.InputFile
+                        label='Imagem'
+                        placeholder='Carregar arquivo'
+                        status={{ invalid: !!errors.title, disabled: loading }}
+                        {...register('image')}
+                        handlers={{ onChange: handleFileChange }}
+                    />
+
+                    <Show when={imagePreview?.length}>
+                        <Flex><Image src={imagePreview} /></Flex>
+                    </Show>
 
                     <Flex gap='1rem' justifyContent='flex-end'>
-                        {
-                            postData.title && postData.body && (
-                                <Action.Btn 
-                                    actionType='submit' 
-                                    state={{ 
-                                        disabled: !postData.title || !postData.body,
-                                        loading: false, 
-                                    }} 
-                                />
-                            )
-                        }
+                        <Show when={!Object.keys(errors).length}>
+                            <Action.Btn 
+                                actionType='submit'
+                                loadingLabel='Salvando' 
+                                state={{ 
+                                    disabled: !!Object.keys(errors).length || loading,
+                                    loading: loading, 
+                                }} 
+                            />
+                        </Show>
+
                         <Action.Btn
                             actionType='cancel'
                             state={{ 
-                                disabled: false 
+                                disabled: loading
                             }} 
-                            habdlers={{ 
+                            handlers={{ 
                                 onCancel: handlers.onCancel  
                             }} 
                         />
@@ -120,6 +160,5 @@ export function FormPost({
                 </Fieldset.Content>
             </Fieldset.Root>
         </form>
-
     )
 }

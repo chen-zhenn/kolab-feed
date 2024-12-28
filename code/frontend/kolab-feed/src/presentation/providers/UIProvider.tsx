@@ -1,9 +1,9 @@
 import {  ChakraProvider } from '@chakra-ui/react'
 import { ThemeProvider } from 'next-themes'
 import { system } from '@/presentation/theme'
-import { IUIProvider } from './types'
+import { IProvider } from './types'
 
-export function UIProvider({ children } : IUIProvider) {
+export function UIProvider({ children } : IProvider) {
   return (
     <ChakraProvider value={system}>
       <ThemeProvider attribute='class' disableTransitionOnChange>

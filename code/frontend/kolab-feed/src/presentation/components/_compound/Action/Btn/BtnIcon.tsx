@@ -1,7 +1,8 @@
 import { 
     LuCheck, 
     LuPencilLine, 
-    LuX 
+    LuX,
+    LuUpload, 
 } from 'react-icons/lu'
 
 import {  
@@ -17,10 +18,10 @@ import {
 
 export default function BtnIcon({ 
     actionType,
-    habdlers,
+    handlers,
  }: IBtn){
     
-    function setIconButton(type: ActionType, handlers?: IHandlers): React.ReactElement {
+    function setIconButton(type?: ActionType, handlers?: IHandlers): React.ReactElement {
         const buttons = {
           edit: 
             <IconButton 
@@ -60,12 +61,20 @@ export default function BtnIcon({
                 >
                     <LuCheck />
                 </IconButton>,
+            upload: 
+            <IconButton 
+                variant='ghost' 
+                size='xs'
+                onClick={handlers?.onUpload}
+            >
+                <LuUpload />
+            </IconButton>,
         }
 
         return buttons[type ?? 'edit']
     }
 
     return (
-        <>{setIconButton(actionType, habdlers)}</>
+        <>{setIconButton(actionType, handlers)}</>
     )
 }

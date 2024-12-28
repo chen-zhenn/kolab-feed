@@ -4,6 +4,7 @@ import {
     Content,
     Sidebar,
     Footer,
+    Container,
     Generic,
 } from './styles'
 import { memo } from 'react'
@@ -14,11 +15,26 @@ function LayoutModule({
 }: ILayout ){
 
     const module = {
-        header: <Header>{children}</Header>,
-        content: <Content>{children}</Content>,
-        sidebar: <Sidebar>{children}</Sidebar>,
-        footer: <Footer>{children}</Footer>,
-        generic: <Generic>{children}</Generic>,
+        header: 
+            <Header>
+               <Container>{children}</Container>
+            </Header>,
+        content: 
+            <Content>
+               <Container>{children}</Container>
+            </Content>,
+        sidebar: 
+            <Sidebar>
+                {children}
+            </Sidebar>,
+        footer: 
+            <Footer>
+              <Container>{children}</Container>
+            </Footer>,
+        generic: 
+            <Generic>
+                <Container>{children}</Container>
+            </Generic>,
       }
 
       return ( module[type ?? 'generic'] )

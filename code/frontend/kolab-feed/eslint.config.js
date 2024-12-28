@@ -3,11 +3,16 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
+import tanstackQuery from '@tanstack/eslint-plugin-query'
 
 export default tseslint.config(
   { ignores: ['dist'] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [
+      js.configs.recommended, 
+      ...tseslint.configs.recommended,
+      tanstackQuery.configs.recommended,
+    ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
@@ -16,6 +21,7 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      '@tanstack/query': tanstackQuery,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -24,7 +30,9 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       'react/react-in-jsx-scope': 'off',
-      '@typescript-eslint/no-explicit-any': 'off'
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@tanstack/query/no-infinite-loops': 'error',
+      '@tanstack/query/prefer-fetch-query': 'warn',
     },
   },
 )

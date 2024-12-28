@@ -1,11 +1,11 @@
-export type ActionType = 'edit' | 'cancel' | 'confirm' | 'submit' | 'upload'
+ export type ActionType = 'edit' | 'cancel' | 'confirm' | 'submit' | 'upload'
 
-export interface IHandlers {
+ export interface IHandlers {
     onEdit?: () => void;
     onCancel?: () => void;
     onConfirm?: () => void;
     onSubmit?: () => void;
-    onclick?: () => void;
+    onclick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     onUpload?: (details: FileAcceptDetails) => void;
 }
 
@@ -16,9 +16,10 @@ export interface IState {
 
 export interface IBtn {
     label?: string;
+    loadingLabel?: string;
     children?: React.ReactNode; 
     actionType?: ActionType;
     state?: IState;
-    habdlers?: IHandlers;
+    handlers?: IHandlers;
     // size?:  
 }

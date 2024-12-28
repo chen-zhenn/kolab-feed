@@ -1,65 +1,54 @@
 import { 
     createBrowserRouter,
     RouterProvider,
-    Navigate 
+    Navigate,
 } from 'react-router'
 
-import { makePost } from '@/main/usecases'
-import { View } from '@/presentation'
+import {
+    makeUser, 
+    makePost, 
+} from '@/main/usecases'
 
+import { View } from '@/presentation'
+import { 
+    Login, 
+    Feed,
+    Post, 
+} from '@/presentation/pages'
+
+const user = makeUser()
 const post = makePost()
 
 const router = createBrowserRouter([{
-    // Rotas Publica
-    element: <View.Auth />,
+    element: <View.Public />,
     children: [{
         path: '/',
-        element: <Navigate to='/login' />,
+        element: <Navigate to='/login' />
     },{
         path: '/login',
-        element: 'Page Login',
-    }]
-},{
-    // Rotas Autenticadas
-    element: <View.App />,
-    children: [
-        {
-            path: '/feed',
-            element: <View.Pages.Feed />,
-            loader: async () => post.getAll(),
-            children: [{
-            },{
-                path: 'posts',
-            },{
-                path: 'add',
-            },{
-                path: 'edit',
-            },{
-                path: 'delete',
-            },]
+        element: <Login />
+    }] 
+}, {
+    element: <View.Auth />,
+    children: [{
+        path: '/feed',
+        element: <Feed />,
+        loader: async () => await post.getAll(),
+        children: [{
+            path: 'add',
+        }, {
+            path: 'edit/:id',
         },{
-            path: '/posts',
-            element: <View.Pages.Post />,
-            loader: async () => post.getAll(),
-            children: [{
-                path: 'edit',
-            },{
-                path: 'delete',
+            path: 'delete/:id', 
+        },{
+            path: 'posts',
+            element: <Post />,
+            children:[{
+                path: ':user_id',
+                loader: async ({ params }) => await console.log('Mostrar usuário por ID'),
             }]
-        },{
-            path: '/posts/:userId',
-            element: <View.Pages.Post />,
-            loader: async ({ params }) => post.getAll({ ...params }),
-            children: [{
-                path: 'edit',
-            },{
-                path: 'delete',
-            }]
-        },{
-            path: '/profile',
-            element: 'User Profile Page',
-        }
-    ]
+        }]
+    }],
 }])
 
 export function Router() {
