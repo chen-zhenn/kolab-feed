@@ -17,6 +17,7 @@ import {
 import { 
     ISupaBaseUser,
     HttpResponseHandler,
+    IHttpPostQueryParams,
 } from '@/main/services'
 
 // import {} from '@/main/services'
@@ -141,18 +142,6 @@ export class ServiceSupaBase {
         return HttpResponseHandler.handleSuccess(data)
     }
 
-    async readAllById<T>(user_id: string): Promise<IHttpResponse<T[]>> {
-        const { data, error } = await SupaBaseClient
-            .from(this.table)
-            .select(`
-                *
-            `)
-            .eq('userId', user_id)
-
-        if(error) return HttpResponseHandler.handleError(error)
-        return HttpResponseHandler.handleSuccess(data)
-    }
-
     async readAllPost<T>(): Promise<IHttpResponse<T[]>> {
 
         const { data, error } = await SupaBaseClient
@@ -166,7 +155,7 @@ export class ServiceSupaBase {
         return HttpResponseHandler.handleSuccess(data)
     }
 
-    async readPostById<T>(user_id: string): Promise<IHttpResponse<T[]>> {
+    async readPostById<T>(id: string): Promise<IHttpResponse<T[]>> {
 
         const { data, error } = await SupaBaseClient
             .from(this.table)
@@ -175,8 +164,24 @@ export class ServiceSupaBase {
                 users(*),
                 comments(*)
             `)
-            .eq('userId', user_id)
+            .eq('id', id)
 
+        if(error) return HttpResponseHandler.handleError(error)
+        return HttpResponseHandler.handleSuccess(data)
+    }
+
+    async filteringPostByParams<T>(
+        column: Partial<Record<keyof IHttpPostQueryParams, string | number>>
+    ): Promise<IHttpResponse<T[]>> {
+
+        let query = SupaBaseClient.from(this.table).select(`*`)
+
+        if(Object.keys(column).length) {
+            for(const [key, value] of Object.entries(column)) 
+                if (value !== undefined) query = query.eq(key, value)
+        }
+        
+        const { data, error } = await query
         if(error) return HttpResponseHandler.handleError(error)
         return HttpResponseHandler.handleSuccess(data)
     }
@@ -203,7 +208,7 @@ export class ServiceSupaBase {
     //=                      DELETE DATA                                //
     //================================================================//
 
-    async delete<T>(column: Record<string, any>): Promise<IHttpResponse<T[]>> {
+    async delete<T>(column: Record<string, number>): Promise<IHttpResponse<T[]>> {
         
         const [key, value] = Object.entries(column)[0]
         
