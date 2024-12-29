@@ -42,12 +42,34 @@ const router = createBrowserRouter([{
             path: 'delete/:id', 
         },{
             path: 'posts',
-            element: <Post />,
-            children:[{
-                path: ':user_id',
-                loader: async ({ params }) => await console.log('Mostrar usuário por ID'),
-            }]
+        },{
+            path: 'posts/:id',
+        },{
+            path: 'posts/user/:user_id',
         }]
+    },{
+        path: '/posts',
+        element: <Post />,
+        loader: async ({ params }) => await post.filterByParams({ ...params }),
+        children: [{
+            path: 'edit/:id',
+        },{
+            path: 'delete/:id',
+        },{
+            path: 'user',
+            children: [{
+                path: 'edit/:id',
+            },{
+                path: 'delete/:id',
+            },{
+                path: ':user_id',
+                children: [{
+                    path: 'edit/:id',
+                },{
+                    path: 'delete/:id',
+                }],
+            }]
+        }],
     }],
 }])
 
