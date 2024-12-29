@@ -1,20 +1,33 @@
-import { NavLink, useLocation } from 'react-router'
+import { 
+    NavLink, 
+    useLocation,
+    useParams,
+} from 'react-router'
+
+import { colors } from '@/presentation/theme'
 
 import { 
     BreadcrumbRoot,
     BreadcrumbLink,
- } from '@/presentation/components'
+} from '@/presentation/components'
 
- import { Container } from './styles'
+import { Container } from './styles'
 
 export function BreadNav(){
 
     const { pathname } = useLocation()
+    const params = useParams()
 
     function mount(): any[] {
-        const levels = pathname
+        let levels = pathname
             .split('/')
             .filter(path => !!path.length)
+
+        if(Object.keys(params)) {
+            for(const key in params) 
+                levels = levels.filter(level => level !== params[key])
+        }
+
         const links = levels
             .map(path=> `${path[0].toUpperCase()}${path.slice(1)}`)
             .map((path, index) => 
@@ -22,7 +35,7 @@ export function BreadNav(){
                     label: path,  
                     link: `/${levels.slice(0, index + 1).join('/')}`,
                     active: index !== levels.length - 1,  
-                    navigable: index !== levels.length - 1 || levels.length < 2,  
+                    navigable: true,  
                 }))
         return links
     }
@@ -34,8 +47,8 @@ export function BreadNav(){
                     mount().map(item => (
                         <BreadcrumbLink key={item.link}>
                         <NavLink 
-                            to={item.navigable ? item.link : pathname}
-                            style={{ color: 'rgba(26, 32, 44, 1)' }}
+                            to={item.link}
+                            style={{ color: colors.secondary500 }}
                         >
                             {item.label}
                         </NavLink>
