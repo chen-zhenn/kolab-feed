@@ -4,6 +4,7 @@ import {
 
 import { 
     useParams,
+    useRevalidator,
 } from 'react-router'
 
 import { 
@@ -44,6 +45,7 @@ export function FormPost({
     handlers 
 }: IFormPost){
 
+    const { revalidate, state } = useRevalidator()
     const { id: post_id } = useParams()
 
     const { 
@@ -80,7 +82,8 @@ export function FormPost({
             const response = await post.create(payload)
             if(response) {
                 launchToast(response)
-                return response
+                revalidate()
+                if(state !== 'loading') return response
             }   
         } catch (error) {
             const response = {

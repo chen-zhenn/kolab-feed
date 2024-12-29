@@ -5,6 +5,7 @@ import {
     useNavigate,
     useLocation,
     useParams,
+    useRevalidator,
 } from 'react-router'
 
 import { 
@@ -44,6 +45,7 @@ import { CrudAction } from './types'
 
 export default function Post() {
 
+    const { revalidate, state } = useRevalidator()
     const nav = useNavigate()
     const { pathname } = useLocation()
     const { id: post_id } = useParams()
@@ -206,7 +208,8 @@ export default function Post() {
             const response = await post.delete({ id: parseInt(post_id) })
             if(response) {
                 launchToast(response)
-                return response
+                revalidate()
+                if(state !== 'loading') return response
             }   
         } catch (error) {
             const response = {
