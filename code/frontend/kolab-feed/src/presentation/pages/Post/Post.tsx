@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { 
     useLoaderData,
@@ -42,13 +42,14 @@ import {
 import { Partial } from './Partials'
 import { CrudAction } from './types'
 
-export default function Post(){
+export default function Post() {
 
     const nav = useNavigate()
     const { pathname } = useLocation()
     const { id: post_id } = useParams()
     const [open, setOpen] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
+    const [hideHeader] = useState<boolean>(/^\/posts\/user\/.*/.test(pathname))
     const [action, setAction] = useState<CrudAction>('add')
     const [modalOptions, setModalOptions] = useState<{ title: string }>({
         title: 'Complete o Cadastro'
@@ -71,7 +72,7 @@ export default function Post(){
             statusText: 'error',
             message: HttpStatusMessages.servererror,
         }
-        return launchToast(response)
+        launchToast(response)
     }
 
     function handlePostHeaderBody(post: IPost): React.ReactNode {
@@ -86,11 +87,11 @@ export default function Post(){
                 <PostHeader.Avatar 
                     imageSource={user?.avatar} 
                     imageName={user?.username}
-                    onClick={() => nav(`/posts/${post.id}`)} 
+                    onClick={() => nav(`${pathname.replace(/\/(feed|add|edit|delete|posts|user)\/?.*/, '')}/posts/user/${post.user_id}`)} 
                 />
                 <PostHeader.Title 
                     title={user?.username}
-                    onClick={() => nav(`/posts/${post.id}`)} 
+                    onClick={() => nav(`${pathname.replace(/\/(feed|add|edit|delete|posts|user)\/?.*/, '')}/posts/user/${post.user_id}`)} 
                 />
                 <PostHeader.Action 
                     action={true} 
@@ -167,7 +168,7 @@ export default function Post(){
     }
 
     function handleConfirmBodyPost(details: ValueChangeDetails): void {
-        nav(`${pathname.replace(/\/(add|edit|delete)\/?\d*/, '')}/add`)
+        nav(`${pathname.replace(/\/(add|edit|delete)\/?.*/, '')}/add`)
         setPostData(prevData => ({
             ...prevData,
             body: details.value
@@ -177,7 +178,7 @@ export default function Post(){
     }
 
     function handleUpdatePost(post: IPost): void {
-        nav(`${pathname.replace(/\/(add|edit|delete)\/?\d*/, '')}/edit/${post.id}`)
+        nav(`${pathname.replace(/\/(add|edit|delete)\/?.*/, '')}/edit/${post.id}`)
         const { title, body, image   } = post
         setPostData(prevData => ({
             ...prevData,
@@ -190,18 +191,19 @@ export default function Post(){
     }
 
     function handleDeletePost(post: IPost): void {
-        nav(`${pathname.replace(/\/(add|edit|delete)\/?\d*/, '')}/delete/${post.id}`)
+        nav(`${pathname.replace(/\/(add|edit|delete)\/?.*/, '')}/delete/${post.id}`)
         setAction('delete')
         setModalOptions({ title: 'Deletar Post?' })
         setOpen(true)
     }
 
     async function handleConfirmDeletePost(): Promise<IHttpResponse<IPostData[]> | any> {
+        if (!post_id) return
         const post = makePost()
         setLoading(true)
 
         try {
-            const response = await post.delete({ id: post_id })
+            const response = await post.delete({ id: parseInt(post_id) })
             if(response) {
                 launchToast(response)
                 return response
@@ -222,16 +224,20 @@ export default function Post(){
     
     return (
         <>
-             <Partial.PostHeader
-                data={posts}
-                postData={postData} 
-                handlers={{ 
-                    handlePostHeaderBody,
-                    handlePostContentBody,
-                    handlePostCommentBody,
-                    handleConfirmBodyPost 
-                }} 
-            />
+            {
+                !hideHeader && (
+                    <Partial.PostHeader
+                        data={posts}
+                        postData={postData} 
+                        handlers={{ 
+                            handlePostHeaderBody,
+                            handlePostContentBody,
+                            handlePostCommentBody,
+                            handleConfirmBodyPost 
+                        }} 
+                    />
+                )
+            }
 
             {
                 !!posts.length && (
@@ -254,7 +260,7 @@ export default function Post(){
                 handlers={{
                     onOpenChange: (details) => setOpen(details.open),
                     onExitComplete: () => {
-                        nav(`${pathname.replace(/\/(add|edit|delete)\/?\d*/, '')}`)
+                        nav(`${pathname.replace(/\/(add|edit|delete|posts|user)\/?.*/, '')}`)
                         setPostData({ title: '', body: '', image: '' })
                     }
                 }}
