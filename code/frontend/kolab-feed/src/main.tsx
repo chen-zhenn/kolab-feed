@@ -10,9 +10,7 @@ import './index.css'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <UIProvider>
-      <QueryClientProvider>
         <Router />
-      </QueryClientProvider>
     </UIProvider>
   </StrictMode>
 )
