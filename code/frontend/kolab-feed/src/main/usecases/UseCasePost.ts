@@ -35,8 +35,8 @@ export async function UseCaseGetPost(queryParams?: IHttpPostQueryParams): Promis
 
         const serviceGetPost = new ServiceGetPost(params, httpClient)
         const serviceSupaBase = new ServiceSupaBase('posts')
-        const data = await queryParams?.user_id ? 
-            serviceSupaBase.readPostById<IPost>(`${queryParams?.user_id}`) : 
+        const data = await queryParams?.id ? 
+            serviceSupaBase.readPostById<IPost>(`${queryParams?.id}`) : 
             serviceSupaBase.readAllPost<IPost>()
         return data
     } catch (error) {
@@ -50,8 +50,16 @@ export async function UseCaseCreatePost(postData: IPostData): Promise<IHttpRespo
     return data
 }
 
-export async function UseCaseDeletePost(column: Record<string, any>): Promise<IHttpResponse<IPostData[]>> {
+export async function UseCaseDeletePost(column: Record<string, number>): Promise<IHttpResponse<IPostData[]>> {
     const serviceSupaBase = new ServiceSupaBase('posts')
     const data = await serviceSupaBase.delete<IPostData>(column)
+    return data
+}
+
+export async function UseCaseFilteringPostByParams(
+    queryParams: IHttpPostQueryParams
+): Promise<IHttpResponse<IPostData[]>> {
+    const serviceSupaBase = new ServiceSupaBase('posts')
+    const data = await serviceSupaBase.filteringPostByParams<IPostData>(queryParams)
     return data
 }
