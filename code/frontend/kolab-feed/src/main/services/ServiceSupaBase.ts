@@ -18,6 +18,7 @@ import {
     ISupaBaseUser,
     HttpResponseHandler,
     IHttpPostQueryParams,
+    ISupaBaseLogin,
 } from '@/main/services'
 
 export class ServiceSupaBase {
@@ -33,7 +34,7 @@ export class ServiceSupaBase {
     //================================================================//
 
     //-AUTH: LOGIN
-    static async Login({ email, password }: IAuth) {
+    static async Login({ email, password }: IAuth): Promise<ISupaBaseLogin | any> {
         const { data, error } = await SupaBaseClient.auth.signInWithPassword({
             email,
             password,
@@ -43,9 +44,22 @@ export class ServiceSupaBase {
 
         return {
             data,
-            status: HttpStatusCode.success,
+            status: 200,
             statusText: 'ok',
             message: ''
+        }
+    }
+
+    //-AUTH: LOGOUT
+    static async Logout() {
+        const { error } = await SupaBaseClient.auth.signOut()
+
+        if(error) return HttpResponseHandler.handleError(error)
+
+        return {
+            status: 204,
+            statusText: 'success',
+            message: 'Desconectado com sucesso'
         } 
     }
 

@@ -14,6 +14,22 @@ export interface ISupaBaseUser {
     role?: string;
 }
 
+export interface ISupaBaseSession {
+    token_type: string;
+    access_token: string;
+    refresh_token?: string;
+    expires_in: number;
+    expires_at: number;
+}
+
+export interface ISupaBaseLogin {
+    session: {
+        user: ISupaBaseUser;
+        session: ISupaBaseSession;
+        weakPassword?: any | undefined;
+    } 
+}
+
 export enum HttpStatusMessages {
     servererror = 'Erro interno: Problema ao processar sua solicitação. Tente novamente mais tarde',
     badrequest = 'Dados inválidos: Os parâmetros fornecidos na sua solicitação são inválidos.',
