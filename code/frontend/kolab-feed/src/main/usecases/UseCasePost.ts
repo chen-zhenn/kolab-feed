@@ -34,11 +34,7 @@ export async function UseCaseGetPost(queryParams?: IHttpPostQueryParams): Promis
         const httpClient = new HttpClient<IPost[], IHttpPostQueryParams>(httpInstance.httpClient)
 
         const serviceGetPost = new ServiceGetPost(params, httpClient)
-        const serviceSupaBase = new ServiceSupaBase('posts')
-        const data = await queryParams?.id ? 
-            serviceSupaBase.readPostById<IPost>(`${queryParams?.id}`) : 
-            serviceSupaBase.readAllPost<IPost>()
-        return data
+        return await serviceGetPost.getAll()
     } catch (error) {
         throw new Error(`${error}`)
     }
@@ -46,13 +42,24 @@ export async function UseCaseGetPost(queryParams?: IHttpPostQueryParams): Promis
 
 export async function UseCaseCreatePost(postData: IPostData): Promise<IHttpResponse<IPostData[]>> {
     const serviceSupaBase = new ServiceSupaBase('posts')
+    const data = await serviceSupaBase.createPost<IPostData>(postData)
+    return data
+}
+
+export async function UseCaseReadPosts(): Promise<IHttpResponse<IPostData[]>> {
+    const serviceSupaBase = new ServiceSupaBase('posts')
+    return await serviceSupaBase.readAllPost<IPost>()
+}
+
+export async function UseCaseUpdatePost(postData: IPostData): Promise<IHttpResponse<IPostData[]>> {
+    const serviceSupaBase = new ServiceSupaBase('posts')
     const data = await serviceSupaBase.updatePost<IPostData>(postData)
     return data
 }
 
 export async function UseCaseDeletePost(column: Record<string, number>): Promise<IHttpResponse<IPostData[]>> {
     const serviceSupaBase = new ServiceSupaBase('posts')
-    const data = await serviceSupaBase.delete<IPostData>(column)
+    const data = await serviceSupaBase.deletePost<IPostData>(column)
     return data
 }
 

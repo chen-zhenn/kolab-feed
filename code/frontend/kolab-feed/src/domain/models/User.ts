@@ -1,7 +1,7 @@
 import { IAuth } from './Auth'
 
 export interface IUsers extends IAuth {
-    id: number;
+    id: string;
     post_id: number;
     user_id: string;
     username: string;

@@ -7,12 +7,13 @@ export interface IPostData {
     body: string;
     imageFile?: File;
     image?: string
+    user_id?: string;
+    email?: string;
+    user?: IUsers;
 }
 
 export interface IPost extends IPostData {
     id: number;
-    user_id: string;
-    users: IUsers[];
     created_at: string;
     comments?: IComments[];
 }

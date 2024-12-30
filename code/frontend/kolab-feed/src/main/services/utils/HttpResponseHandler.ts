@@ -21,7 +21,7 @@ export class HttpResponseHandler {
         }
     }
 
-    static handleError(error: any): IHttpResponse<[]> {
+    static handleError(error?: any): IHttpResponse<[]> {
         const errorCode: SupabaseErrorCodes = error.code ?? 'UnknownError'
         const status = SupabaseStatusCode[errorCode] || HttpStatusCode.servererror
         const message = SupabaseStatusMessage[errorCode] ||  HttpStatusMessages.servererror

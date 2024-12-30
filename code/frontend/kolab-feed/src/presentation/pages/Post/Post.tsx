@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import { 
     useLoaderData,
@@ -49,6 +49,7 @@ export default function Post() {
     const nav = useNavigate()
     const { pathname } = useLocation()
     const { id: post_id } = useParams()
+    const response: IHttpResponse<IPost[]> = useLoaderData()
     const [open, setOpen] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
     const [hideHeader] = useState<boolean>(/^\/posts\/user\/.*/.test(pathname))
@@ -66,8 +67,9 @@ export default function Post() {
     let posts: IPost[] = []
 
     try {
-        const response: IHttpResponse<IPost[]> = useLoaderData()
-        if(response && response.status === 200) posts = response?.data ?? []
+        
+        if(response && response.status === 200) 
+            if (response.data) posts = response?.data
     } catch (error) {
         const response = {
             status: HttpStatusCode.servererror,
@@ -78,21 +80,15 @@ export default function Post() {
     }
 
     function handlePostHeaderBody(post: IPost): React.ReactNode {
-        let user = {} as { username?: string, avatar?: string }
-        if(post && post.users) {
-            const data = post.users.filter(user => user.post_id === post.id) 
-            if(data.length) user = data[0]
-        }
-
         return (
             <PostHeader.Container>
                 <PostHeader.Avatar 
-                    imageSource={user?.avatar} 
-                    imageName={user?.username}
+                    imageSource={post?.user?.avatar} 
+                    imageName={post?.user?.username}
                     onClick={() => nav(`${pathname.replace(/\/(feed|add|edit|delete|posts|user)\/?.*/, '')}/posts/user/${post.user_id}`)} 
                 />
                 <PostHeader.Title 
-                    title={user?.username}
+                    title={post?.user?.username}
                     onClick={() => nav(`${pathname.replace(/\/(feed|add|edit|delete|posts|user)\/?.*/, '')}/posts/user/${post.user_id}`)} 
                 />
                 <PostHeader.Action 
@@ -173,7 +169,7 @@ export default function Post() {
         nav(`${pathname.replace(/\/(add|edit|delete)\/?.*/, '')}/add`)
         setPostData(prevData => ({
             ...prevData,
-            body: details.value
+            body: details.value,
         }))
         setAction('add')
         setOpen(true)
@@ -181,12 +177,13 @@ export default function Post() {
 
     function handleUpdatePost(post: IPost): void {
         nav(`${pathname.replace(/\/(add|edit|delete)\/?.*/, '')}/edit/${post.id}`)
-        const { title, body, image   } = post
+        const { title, body, image } = post
         setPostData(prevData => ({
             ...prevData,
             title,
             body,
             image,
+            user_id: post.user_id,
         }))
         setAction('edit')
         setOpen(true)

@@ -14,6 +14,7 @@ export const Title = styled.h5`
     ${shared}
     &:hover {
         text-decoration: underline;
+        color: var(--chakra-colors-blue-300);
     }
 `
 

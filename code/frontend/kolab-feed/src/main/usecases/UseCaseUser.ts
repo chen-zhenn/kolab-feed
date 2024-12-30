@@ -1,4 +1,12 @@
-import { IAuth } from '@/domain/models'
+import { 
+    IAuth,
+    IUsers,
+} from '@/domain/models'
+
+import {  
+    IHttpResponse,
+} from '@/infra'
+
 import {
     ISupaBaseUser, 
     ServiceSupaBase, 
@@ -8,6 +16,10 @@ export async function UseCaseUserLogin(authData: IAuth): Promise<any> {
     return ServiceSupaBase.Login(authData)
 }
 
-export async function UseCaseGetUser(): Promise<ISupaBaseUser | null> {
-    return ServiceSupaBase.getUser()
+export async function UseCaseGetUserAuth(): Promise<ISupaBaseUser | null> {
+    return ServiceSupaBase.getUserAuth()
+}
+
+export async function UseCaseGetUsersById(user_id: string): Promise<IHttpResponse<IUsers[]>>  {
+    return ServiceSupaBase.getUsersById<IUsers>(user_id)
 }

@@ -1,4 +1,8 @@
-import { useContext } from 'react'
+const { 
+    VITE_APP_BASE_URL 
+} = import.meta.env
+
+import { memo, useContext, useEffect, useState } from 'react'
 
 import { useNavigate } from 'react-router'
 
@@ -11,21 +15,31 @@ import {
     Input,
 } from '@chakra-ui/react'
 
-import { UIContext } from '@/states/context'
+import {
+    makeUser,  
+  } from '@/main/usecases'
 
-import { Avatar } from '@/presentation/components'
+import { UIContext } from '@/states/context'
 
 import { 
     Section,
- } from './styles'
+} from './styles'
 
 import { ITopBar } from './types'
 
-export default function TopBarSection({ type, children }: ITopBar) {
+import { Partial } from './Partials'
 
+function TopBarSection({ 
+    type, 
+    children, 
+}: ITopBar) {
+
+    const user = makeUser()
     const uiState = useContext(UIContext)
     const nav = useNavigate()
     const { visibility, setVisibility } = uiState
+
+
 
     const section: Record<string, any> = {
         burger: 
@@ -37,20 +51,19 @@ export default function TopBarSection({ type, children }: ITopBar) {
         brand: 
             <Section>
                 <Image 
-                    src='logo.svg' 
+                    src={`${VITE_APP_BASE_URL}/logo.svg`} 
                     onClick={() => nav('/feed')} style={{ cursor: 'pointer' }} />
             </Section>,
         search: 
             <Section className='-search'>
                 <Input placeholder='Pesquise por usuário' variant='subtle' />
             </Section>,
-        profile: 
-            <Section>
-                <Avatar name='John Doe' src='https://bit.ly/sage-adebayo' />
-            </Section>,
+        profile: <Partial.TopBarProfile />,
         generic: 
             <Section>{children}</Section>,
       }
 
     return ( section[type ?? 'generic'] )
 }
+
+export default memo(TopBarSection)

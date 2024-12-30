@@ -4,8 +4,7 @@ import {
     Navigate,
 } from 'react-router'
 
-import {
-    makeUser, 
+import { 
     makePost, 
 } from '@/main/usecases'
 
@@ -13,10 +12,9 @@ import { View } from '@/presentation'
 import { 
     Login, 
     Feed,
-    Post, 
+    Post,
+    Profile, 
 } from '@/presentation/pages'
-
-const user = makeUser()
 const post = makePost()
 
 const router = createBrowserRouter([{
@@ -70,6 +68,9 @@ const router = createBrowserRouter([{
                 }],
             }]
         }],
+    }, {
+        path: '/profile',
+        element: <Profile />,
     }],
 }])
 

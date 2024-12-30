@@ -6,7 +6,10 @@ import {
 
 import {
   Flex,
+  Spinner,
 } from '@chakra-ui/react'
+
+import { IUsers } from '@/domain/models'
 
 import {
   makeUser,  
@@ -22,8 +25,6 @@ import { Layout } from '@/presentation/layout'
 
 import {  
   BreadNav,
-  ProgressCircleRoot,
-  ProgressCircleRing 
 }  from '@/presentation/components'
 
 import { 
@@ -42,14 +43,18 @@ function App() {
  
   useEffect(() => {
     (async function(){
-        const response = await user.get()
-        const isAuthenticated = response?.role === 'authenticated'
-        if(!response || !isAuthenticated) {
-          setLoading(false)
+
+      try {
+        const userAuth = await user.getUserAuth()
+        const isAuthenticated = userAuth?.role === 'authenticated'
+        if(!userAuth || !isAuthenticated) 
           return redirect('/login')
-        }
         setAuthenticated(isAuthenticated)
+      } catch (error) {
+        return redirect('/login')
+      } finally {
         setLoading(false)
+      }
     }())
   }, [user])
 
@@ -63,9 +68,11 @@ function App() {
         height='100vh'
         backgroundColor={colors.primary}
       >
-          <ProgressCircleRoot value={null}>
-            <ProgressCircleRing cap='round' color={colors.secondary400} />
-          </ProgressCircleRoot>
+        <Spinner 
+          color={colors.secondary} 
+          size='xl' 
+          borderWidth='5px' 
+        />
         </Flex>
       </Layout.Module>
     </Layout.Wrap>

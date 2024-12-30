@@ -1,4 +1,15 @@
 import { 
+    useEffect, 
+    useState,
+} from 'react'
+
+import { IUsers } from '@/domain/models'
+
+import {
+    makeUser,  
+} from '@/main/usecases'
+
+import { 
     PostCard,
     PostHeader,
     EditableField,
@@ -16,8 +27,24 @@ export default function PostHeaderPart({
     handlers,
 }: IPostPage){
 
-    const user = data
-        ?.flatMap(post => post.users?.filter(user => user.post_id === post.id))[0]
+    const user = makeUser()
+    const [userData, setUserData] = useState<IUsers>()
+
+    useEffect(() => {
+        (async function(){
+            try {
+                const userAuth = await user.getUserAuth()
+                if(userAuth && userAuth.id) {
+                    const userResponse = await user.getById(userAuth.id)
+                    if(userResponse && userResponse.status === 200) {
+                        if(userResponse.data) setUserData(userResponse.data[0])
+                    }
+                }
+            } catch (error) {
+                //
+            }
+        }())
+    }, [])
 
     return (
         <Header>
@@ -25,8 +52,8 @@ export default function PostHeaderPart({
                     <PostCard.Header>
                         <PostHeader.Container>
                         <PostHeader.Avatar 
-                            imageSource={user?.avatar} 
-                            imageName={user?.username} 
+                            imageSource={userData?.avatar} 
+                            imageName={userData?.username} 
                             />
                             <aside style={{ flexGrow: 1 }}>
                                 <EditableField

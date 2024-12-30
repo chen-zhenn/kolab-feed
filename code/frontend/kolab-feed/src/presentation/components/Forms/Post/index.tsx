@@ -76,10 +76,11 @@ export function FormPost({
     async function onSubmit(data: IPostData): Promise<IHttpResponse<IPostData[]> | any> {
         const payload = {...data, imageFile }
         if(post_id) payload.id = parseInt(post_id)
+        const operation = post_id ? post.update(payload) : post.create(payload)
         setLoading(true)   
 
         try {
-            const response = await post.create(payload)
+            const response = await operation
             if(response) {
                 launchToast(response)
                 revalidate()

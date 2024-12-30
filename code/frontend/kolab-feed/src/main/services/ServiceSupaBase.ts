@@ -20,11 +20,10 @@ import {
     IHttpPostQueryParams,
 } from '@/main/services'
 
-// import {} from '@/main/services'
-
 export class ServiceSupaBase {
     private supabaseUrl = VITE_SUPABASE_URL
-
+    private email: string | null = null
+    
     constructor(readonly table: string) {
         this.table =  table
     }
@@ -51,123 +50,169 @@ export class ServiceSupaBase {
     }
 
     //-AUTH: GET USER
-    static async getUser(): Promise<ISupaBaseUser | null> {
+    static async getUserAuth(): Promise<ISupaBaseUser | null> {
         const { data: { user } } = await SupaBaseClient.auth.getUser()
         return user
+    }
+
+
+    static async getUsersById<T>(user_id?: string): Promise<IHttpResponse<T[]>> {
+        if(!user_id) 
+            return HttpResponseHandler
+        .handleError({ error: { code: '22P02' } })
+        
+        const { data: usersData, error: usersError } = await SupaBaseClient
+            .from('users')
+            .select('*')
+            .eq('user_id', user_id)
+
+        if(usersError) return HttpResponseHandler.handleError(usersError)
+        return HttpResponseHandler.handleSuccess(usersData)
     }
 
     //================================================================//
     //=                      CREATE DATA                                //
     //================================================================//
 
-    async create<T>(payload: T): Promise<IHttpResponse<T[]>> {
-        let responseData: IHttpResponse<T[]> = {
-            data: [],
-            status: HttpStatusCode.servererror,
-            statusText: '',
-            message: ''
-        } 
-        return responseData
-    }
-
-    async updatePost<T>(payload: IPostData): Promise<IHttpResponse<IPostData[]>> {
-        let users: IUsers[] = []
-        let imagePath: string | null = null
-
+    async createPost<T>(payload: IPostData): Promise<IHttpResponse<IPostData[]>> {
         //-USER
-        const currentUser = await ServiceSupaBase.getUser() 
-        const response = await ServiceSupaBase.getUserById(currentUser?.id)
-        users =  [...response.data]
-    
+        const newPayload = await this.handleUserPayload(payload)
+        
         //-IMAGE STORAGE
-        const { imageFile, ...newData } = payload as any
-        if(imageFile) {
-            const { data: storageData, error: uploadError } = await SupaBaseClient
-            .storage
-            .from('post-image')
-            .upload(`${Date.now()}-${imageFile.name}`, imageFile, {
-                cacheControl: '3600',
-                upsert: false
-            })
-
-            if (uploadError) return HttpResponseHandler.handleError(uploadError)
-
-            imagePath = storageData && storageData.fullPath ? 
-                `${this.supabaseUrl}/storage/v1/object/public/${storageData?.fullPath}` : 
-                null
+        try {
+            if(
+                payload.imageFile && 
+                payload.imageFile.type.includes('image')
+            ) {
+                const imagePath = await this.handleUploadPostImage(payload.imageFile)
+                if(imagePath && !(imagePath instanceof Error)) newPayload.image = imagePath
+            }
+            if(typeof newPayload.image !== 'string') delete newPayload.image 
+        } catch (error) {
+            delete newPayload.image
+        } finally {
+            delete newPayload.imageFile
         }
         
-        if(payload.id) {
-            //-POST
-            const { error } = await SupaBaseClient
-                .from(this.table)
-                .update([{ 
-                    id: payload.id,
-                    user_id: currentUser?.id,
-                    image: imagePath,
-                    ...newData,
-                }])
-                .eq('id', payload.id)
-                .select()
+        if(!newPayload.image) delete newPayload.image
+        const { email, ...newData } = newPayload
 
-            if(error) return HttpResponseHandler.handleError(error)
-            return HttpResponseHandler.handleSuccess([], 200, 'Post atualizado com sucesso!')
-        }
-    
         //-POST
         const { data, error } = await SupaBaseClient
             .from(this.table)
-            .insert([{ 
-                ...newData,
-                user_id: currentUser?.id,
-                image: imagePath,
-            }])
+            .insert([newData])
             .select()
 
-            if(error) return HttpResponseHandler.handleError(error)
-            return HttpResponseHandler.handleSuccess(data, 201, 'Post publicado com sucesso!')
+        if(error) return HttpResponseHandler.handleError(error)
+        return HttpResponseHandler.handleSuccess<IPostData>(data, 201, 'Post publicado com sucesso!')
     }
 
+   //================================================================//
+    //=                      UPDATE DATA                                //
     //================================================================//
+
+    async updatePost<T>(payload: IPostData): Promise<IHttpResponse<IPostData[]>> {
+        
+        //-USER
+        const newPayload = await this.handleUserPayload(payload)
+
+        if(payload.user_id !== newPayload.user_id) 
+            return HttpResponseHandler.handleError({ code: '42501' })
+
+        //-IMAGE STORAGE
+        try {
+            if(
+                payload.imageFile && 
+                payload.imageFile.type.includes('image')
+            ) {
+                const imagePath = await this.handleUploadPostImage(payload.imageFile)
+                if(imagePath && !(imagePath instanceof Error)) newPayload.image = imagePath
+            }
+            if(typeof newPayload.image !== 'string') delete newPayload.image 
+        } catch (error) {
+            delete newPayload.image
+        } finally {
+            delete newPayload.imageFile
+        }
+
+        if(!newPayload.image) delete newPayload.image
+        
+        //-POST
+        const { data, error } = await SupaBaseClient
+            .from(this.table)
+            .update([newPayload])
+            .eq('id', newPayload.id)
+            .select()
+
+        if(error) return HttpResponseHandler.handleError(error)
+        return HttpResponseHandler.handleSuccess<IPostData>(data, 200, 'Post atualizado com sucesso!')
+    }
+
+   //================================================================//
     //=                      READ DATA                                //
     //================================================================//
 
-    async readAll<T>(): Promise<IHttpResponse<T[]>> {
-        const { data, error } = await SupaBaseClient
-            .from(this.table)
-            .select(`
-                *
-            `)
-        if(error) return HttpResponseHandler.handleError(error)
-        return HttpResponseHandler.handleSuccess(data)
-    }
-
     async readAllPost<T>(): Promise<IHttpResponse<T[]>> {
 
-        const { data, error } = await SupaBaseClient
+        const { data: posts, error: postsError } = await SupaBaseClient
             .from(this.table)
             .select(`
                 *,
-                users(*),
                 comments(*)
             `)
-        if(error) return HttpResponseHandler.handleError(error)
+    
+        if (postsError) return HttpResponseHandler.handleError(postsError)
+    
+        const usersIdList = posts
+            .map(post => post.user_id)
+            .filter(id => id !== null)
+
+        const users_id = [...new Set(usersIdList)]
+
+        const { data: users, error: usersError } = await SupaBaseClient
+            .from('users')
+            .select(`*`)
+            .in('user_id', users_id)
+    
+        if (usersError) return HttpResponseHandler.handleError(usersError)
+        
+        const data = posts.map(post => ({
+            ...post, 
+            user: users.find(user => user.user_id === post.user_id), 
+        }))
+
         return HttpResponseHandler.handleSuccess(data)
     }
 
-    async readPostById<T>(id: string): Promise<IHttpResponse<T[]>> {
+    //================================================================//
+    //=                      DELETE DATA                                //
+    //================================================================//
 
-        const { data, error } = await SupaBaseClient
+    async deletePost<T>(column: Record<string, number>): Promise<IHttpResponse<T[]>> {
+      
+        const [key, value] = Object.entries(column)[0]
+
+        const { data: posts, error: postsError } = await SupaBaseClient
             .from(this.table)
-            .select(`
-                *,
-                users(*),
-                comments(*)
-            `)
-            .eq('id', id)
+            .select(`user_id`)
+            .eq(key, value)
 
+        if(postsError) return HttpResponseHandler.handleError(postsError)
+
+        if (posts) {
+            const post_user_id = posts[0].user_id
+            const userAuth = await this.handleUserPayload({ title: '', body: '' })
+            if(post_user_id !== userAuth.user_id) 
+                return HttpResponseHandler.handleError({ code: '42501' })
+        } 
+        
+        const { error } = await SupaBaseClient
+            .from(this.table)
+            .delete()
+            .eq(key, value)
+        
         if(error) return HttpResponseHandler.handleError(error)
-        return HttpResponseHandler.handleSuccess(data)
+        return HttpResponseHandler.handleSuccess([], 204, 'Post deletado com sucesso!')
     }
 
     async filteringPostByParams<T>(
@@ -186,38 +231,33 @@ export class ServiceSupaBase {
         return HttpResponseHandler.handleSuccess(data)
     }
 
-    static async getUserById(user_id?: string): Promise<any | null> {
+    private async handleUploadPostImage(imageFile: File): Promise<string | Error | null> {
         
-        let id = user_id
-        
-        if(!id) {
-            const user = await ServiceSupaBase.getUser()
-            id = user?.id
+        const { data: storageData, error: uploadError } = await SupaBaseClient
+            .storage
+            .from('post-image')
+            .upload(`${Date.now()}-${imageFile.name}`, imageFile, {
+                cacheControl: '3600',
+                upsert: false
+            })
+    
+        if (uploadError) return uploadError
+    
+        return storageData && storageData.fullPath
+            ? `${this.supabaseUrl}/storage/v1/object/public/${storageData.fullPath}`
+            : null
+    }
+
+    private async handleUserPayload(payload: IPostData): Promise<IPostData> {
+        try {
+            const userAuth = await ServiceSupaBase.getUserAuth()
+            if (userAuth) {
+                const { id: user_id, email } = userAuth
+                return { ...payload, user_id, email }
+            }
+            return payload
+        } catch (error) {
+            return payload
         }
-
-        const { data: usersData, error: usersError } = await SupaBaseClient
-            .from('users')
-            .select('*')
-            .eq('user_id', id)
-
-        if(usersError) return HttpResponseHandler.handleError(usersError)
-        return HttpResponseHandler.handleSuccess<any[]>(usersData)
-    }
-
-    //================================================================//
-    //=                      DELETE DATA                                //
-    //================================================================//
-
-    async delete<T>(column: Record<string, number>): Promise<IHttpResponse<T[]>> {
-        
-        const [key, value] = Object.entries(column)[0]
-        
-        const { error } = await SupaBaseClient
-            .from(this.table)
-            .delete()
-            .eq(key, value)
-        
-        if(error) return HttpResponseHandler.handleError(error)
-        return HttpResponseHandler.handleSuccess([], 204, 'Post deletado com sucesso!')
-    }
+    } 
 }
