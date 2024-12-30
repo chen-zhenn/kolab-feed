@@ -4,7 +4,8 @@ import {
 } from 'react'
 
 import { 
-    NavLink
+    NavLink,
+    useNavigate,
 } from 'react-router'
 
 import { 
@@ -20,9 +21,18 @@ import {
 
 import { IUsers } from '@/domain/models'
 
+import { 
+    HttpStatusCode,
+    IHttpResponse,
+} from '@/infra'
+
+import { HttpStatusMessages } from '@/main/services'
+
 import {
     makeUser,  
 } from '@/main/usecases'
+
+import { Utils } from '@/presentation/shared'
 
 import {
     Avatar,
@@ -36,6 +46,8 @@ import {
 export default function TopBarProfilePart() {
 
     const user = makeUser()
+    const { launchToast } = Utils
+    const nav = useNavigate()
     const [userData, setUserData] = useState<IUsers>()
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState<boolean>(true)
@@ -57,6 +69,30 @@ export default function TopBarProfilePart() {
             }
         }())
     }, [])
+
+    async function handleLogout(): Promise<IHttpResponse<any> | any> {
+        try {
+            const response = await user.logout()
+            if(response) {
+                if(response.status === 204) {
+                    //
+                    localStorage.clear()
+                    return nav('/')
+                }
+                const { statusText, message, ...newResponse } = response
+                newResponse.statusText = 'fail'
+                newResponse.message = 'Algo inesperado: Falha ao desconectar. Por favor, tente novamente'
+                return launchToast(newResponse)
+            }
+        } catch (error) {
+            const response = {
+                status: HttpStatusCode.servererror,
+                statusText: 'error',
+                message: HttpStatusMessages.servererror,
+            }
+            return launchToast(response)
+        }
+    }
 
     return (
         <Section className='-profile' open={open}>
@@ -94,6 +130,7 @@ export default function TopBarProfilePart() {
                             <Text 
                                 className='body__item'
                                 textStyle='xs'
+                                onClick={handleLogout}
                             >
                                 <LuLogOut />
                                 Logout
