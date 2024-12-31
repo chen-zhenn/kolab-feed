@@ -48,7 +48,10 @@ const router = createBrowserRouter([{
     },{
         path: '/posts',
         element: <Post />,
-        loader: async ({ params }) => await post.filterByParams({ ...params }),
+        loader: async ({ params }) => {
+            if (!Object.keys(params).length) return await post.getAll()
+            return await post.filterByParams({ ...params })
+        },
         children: [{
             path: 'edit/:id',
         },{
