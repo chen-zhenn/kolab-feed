@@ -10,5 +10,4 @@ export const Wrap = styled.aside`
     align-items: center;
     height: 100vh;
     background-color: ${colors.primary};
-    // background-color: transparent;
 `

@@ -54,6 +54,8 @@ export const Header = styled.header`
 export const Content = styled.main`
     grid-row: 3;
     grid-column: 1 / 3;
+    height: 100%;
+    overflow-y: auto;
     padding: 1.75rem;
 
     @media(min-width: ${breakpoints.medium}) {
@@ -65,6 +67,7 @@ export const Content = styled.main`
 export const Sidebar = styled.aside`
     grid-row: 2;
     grid-column: 1 / 3;
+    position: relative;
     overflow: hidden;
     height: 0;
     text-align: center;
@@ -85,10 +88,23 @@ export const Sidebar = styled.aside`
         }
     }
 
+    &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            repeating-conic-gradient(${colors.secondary600} 0 0.0001%,#0000 0 0.0002%) 
+            60% 60%/3000px 3000px
+    }
+
 `
 
 export const Footer = styled.footer`
     ${shared}
+    display: none;
     grid-row: 4;
     grid-column: 1 / 3;
     text-align: center;
@@ -120,6 +136,7 @@ function setGridLayout(grid?: GridTemplate): string {
     const goldenRatio = `
         grid-template-rows: repeat(2, max-content) 1fr max-content;
         grid-template-columns: 0.382fr 1fr;
+        height: 100%;
 
         @media (min-width: ${breakpoints.medium}) and (orientation: landscape) {
             grid-template-rows: max-content 1fr max-content;
