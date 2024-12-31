@@ -232,16 +232,37 @@ export class ServiceSupaBase {
         column: Partial<Record<keyof IHttpPostQueryParams, string | number>>
     ): Promise<IHttpResponse<T[]>> {
 
-        let query = SupaBaseClient.from(this.table).select(`*`)
+        let query = SupaBaseClient
+            .from(this.table)
+            .select(`
+                *,
+                comments(*)
+            `)
 
         if(Object.keys(column).length) {
             for(const [key, value] of Object.entries(column)) 
                 if (value !== undefined) query = query.eq(key, value)
         }
         
-        const { data, error } = await query
+        const { data: posts, error } = await query
+
         if(error) return HttpResponseHandler.handleError(error)
-        return HttpResponseHandler.handleSuccess(data)
+
+        if(!column.user_id) return HttpResponseHandler.handleSuccess(posts)
+
+        const { data: users, error: usersError } = await SupaBaseClient
+            .from('users')
+            .select(`*`)
+            .eq('user_id', column.user_id)
+
+        if (usersError) return HttpResponseHandler.handleError(usersError)
+
+        const data = posts?.map(post => ({
+            ...post, 
+            user: users.find(user => user.user_id === post.user_id), 
+        }))
+
+        return HttpResponseHandler.handleSuccess(data ?? [])
     }
 
     private async handleUploadPostImage(imageFile: File): Promise<string | Error | null> {
