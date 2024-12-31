@@ -1,5 +1,6 @@
 export interface IVisibility {
     sidebar: boolean;
+    transition: 'enter' | 'exit' | 'none'; 
 }
 
 export interface IUIContext {

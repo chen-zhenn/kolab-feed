@@ -5,3 +5,5 @@ export * from './BreadNav'
 export * from './Hero'
 export * from './EditableField'
 export * from './Forms'
+
+export * from './animation'

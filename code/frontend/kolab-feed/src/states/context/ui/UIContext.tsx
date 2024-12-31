@@ -6,7 +6,7 @@ import {
 } from './types'
 
 export const initialState: IUIContext = {
-    visibility: { sidebar: true },
+    visibility: { sidebar: true, transition: false },
     setVisibility: (state: IVisibility) => state,
 }
 

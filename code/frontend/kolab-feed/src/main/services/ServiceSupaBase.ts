@@ -23,7 +23,6 @@ import {
 
 export class ServiceSupaBase {
     private supabaseUrl = VITE_SUPABASE_URL
-    private email: string | null = null
     
     constructor(readonly table: string) {
         this.table =  table

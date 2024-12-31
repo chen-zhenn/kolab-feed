@@ -1,6 +1,7 @@
 import { 
     useEffect, 
     useState,
+    useContext,
 } from 'react'
 
 import { 
@@ -19,14 +20,13 @@ import {
     LuLogOut,
 } from 'react-icons/lu'
 
+import { UIContext } from '@/states/context'
+
 import { IUsers } from '@/domain/models'
 
-import { 
-    HttpStatusCode,
+import {
     IHttpResponse,
 } from '@/infra'
-
-import { HttpStatusMessages } from '@/main/services'
 
 import {
     makeUser,  
@@ -47,6 +47,8 @@ export default function TopBarProfilePart() {
 
     const user = makeUser()
     const { launchToast } = Utils
+    const uiState = useContext(UIContext)
+    const { setVisibility } = uiState
     const nav = useNavigate()
     const [userData, setUserData] = useState<IUsers>()
     const [open, setOpen] = useState(false)
@@ -71,26 +73,27 @@ export default function TopBarProfilePart() {
     }, [])
 
     async function handleLogout(): Promise<IHttpResponse<any> | any> {
+
         try {
             const response = await user.logout()
             if(response) {
                 if(response.status === 204) {
-                    //
-                    localStorage.clear()
-                    return nav('/')
+                    setVisibility({ 
+                        sidebar: true, 
+                        transition: 'exit', 
+                      })
                 }
-                const { statusText, message, ...newResponse } = response
-                newResponse.statusText = 'fail'
-                newResponse.message = 'Algo inesperado: Falha ao desconectar. Por favor, tente novamente'
-                return launchToast(newResponse)
             }
         } catch (error) {
-            const response = {
-                status: HttpStatusCode.servererror,
-                statusText: 'error',
-                message: HttpStatusMessages.servererror,
+            const newResponse = {
+                status: 204,
+                statusText:'warning',
+                message:'Algo inesperado: Falha ao desconectar. Por favor, tente novamente'
             }
-            return launchToast(response)
+            return launchToast(newResponse)
+        } finally {
+            localStorage.clear()
+            setTimeout(() => nav('/'), 1445)
         }
     }
 
@@ -133,7 +136,7 @@ export default function TopBarProfilePart() {
                                 onClick={handleLogout}
                             >
                                 <LuLogOut />
-                                Logout
+                                Sair
                             </Text>
                     </Card.Body>
                     )

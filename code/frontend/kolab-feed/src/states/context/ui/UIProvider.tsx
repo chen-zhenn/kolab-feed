@@ -12,7 +12,7 @@ interface IUIProvider {
 } 
 
 export function UIStateProvider({ children }: IUIProvider): React.ReactNode {
-    const [visibility, setVisibility] = useState<IVisibility>({ sidebar: true, })
+    const [visibility, setVisibility] = useState<IVisibility>({ sidebar: true, transition: 'none' })
     const value = useMemo(() => ({
         visibility, 
         setVisibility,

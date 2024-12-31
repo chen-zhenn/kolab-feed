@@ -22,7 +22,7 @@ const InputPassWordControl = forwardRef<HTMLInputElement, IInput>(({
 
         return <PasswordInput 
             placeholder={props?.placeholder}
-            visible={!props?.secret ?? false} 
+            visible={!props?.secret} 
             {...props} 
             ref={ref as React.Ref<HTMLInputElement>}
             onVisibleChange={props?.handlers?.onVisibleChange}    

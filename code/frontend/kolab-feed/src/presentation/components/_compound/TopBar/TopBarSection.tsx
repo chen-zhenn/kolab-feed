@@ -2,7 +2,10 @@ const {
     VITE_APP_BASE_URL 
 } = import.meta.env
 
-import { memo, useContext, useEffect, useState } from 'react'
+import { 
+    memo, 
+    useContext, 
+} from 'react'
 
 import { useNavigate } from 'react-router'
 
@@ -14,10 +17,6 @@ import {
     Image,
     Input,
 } from '@chakra-ui/react'
-
-import {
-    makeUser,  
-  } from '@/main/usecases'
 
 import { UIContext } from '@/states/context'
 
@@ -34,7 +33,6 @@ function TopBarSection({
     children, 
 }: ITopBar) {
 
-    const user = makeUser()
     const uiState = useContext(UIContext)
     const nav = useNavigate()
     const { visibility, setVisibility } = uiState
@@ -45,14 +43,21 @@ function TopBarSection({
         burger: 
             <Section
                 className='-burger'
-                onClick={() => setVisibility({ sidebar: !visibility.sidebar })}>
+                onClick={() => 
+                    setVisibility({ 
+                        ...visibility, 
+                        sidebar: !visibility.sidebar, 
+                    })
+                }
+                >
                 <FaBars size='1.25em' />
             </Section>,
         brand: 
             <Section>
                 <Image 
                     src={`${VITE_APP_BASE_URL}/logo.svg`} 
-                    onClick={() => nav('/feed')} style={{ cursor: 'pointer' }} />
+                    onClick={() => nav('/feed')} style={{ cursor: 'pointer' }} 
+                />
             </Section>,
         search: 
             <Section className='-search'>

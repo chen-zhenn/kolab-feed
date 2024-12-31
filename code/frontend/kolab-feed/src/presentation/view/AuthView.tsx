@@ -1,15 +1,20 @@
 import { 
+  useState,
+  useEffect,
+  useContext, 
+} from 'react'
+
+import { 
   Navigate,
   Outlet,
   redirect,
 } from 'react-router'
 
 import {
-  Flex,
   Spinner,
 } from '@chakra-ui/react'
 
-import { IUsers } from '@/domain/models'
+import { UIContext } from '@/states/context'
 
 import {
   makeUser,  
@@ -25,6 +30,7 @@ import { Layout } from '@/presentation/layout'
 
 import {  
   BreadNav,
+  OverlayTransition,
 }  from '@/presentation/components'
 
 import { 
@@ -32,23 +38,39 @@ import {
   Sidebar,
   Footer, 
 }  from '@/presentation/includes'
-import { useEffect, useState } from 'react'
 
 function App() {
 
+  const user = makeUser()
+  const uiState = useContext(UIContext)
+  const { visibility, setVisibility } = uiState
   const [authenticated, setAuthenticated] =  useState<boolean>(false)
   const [loading, setLoading] =  useState<boolean>(true)
-
-  const user = makeUser()
  
+  useEffect(() => {
+    if (loading && !authenticated) {
+      setVisibility({ 
+        sidebar: false, 
+        transition: 'enter', 
+      })
+    }
+    setTimeout(() => {
+      setVisibility({ 
+        sidebar: true, 
+        transition: 'enter', 
+      })
+    }, 1500)
+  }, [loading, authenticated])
+
   useEffect(() => {
     (async function(){
 
       try {
         const userAuth = await user.getUserAuth()
         const isAuthenticated = userAuth?.role === 'authenticated'
-        if(!userAuth || !isAuthenticated) 
+        if(!userAuth || !isAuthenticated) {
           return redirect('/login')
+        }
         setAuthenticated(isAuthenticated)
       } catch (error) {
         return redirect('/login')
@@ -58,50 +80,47 @@ function App() {
     }())
   }, [user])
 
-
   if(loading && !authenticated) return (
-    <Layout.Wrap>
-      <Layout.Module>
-      <Flex 
-        justifyContent='center' 
-        alignItems='center'
-        height='100vh'
-        backgroundColor={colors.primary}
-      >
-        <Spinner 
-          color={colors.secondary} 
-          size='xl' 
-          borderWidth='5px' 
-        />
-        </Flex>
-      </Layout.Module>
-    </Layout.Wrap>
+    <>
+      <Spinner 
+        size='xl' 
+        position='absolute'
+        top='50%'
+        left='50%'
+        color={colors.secondary} 
+        zIndex={99} 
+      />
+      <OverlayTransition  animate={visibility.transition} />
+    </>
   )
 
   return (
     <>
       {
         authenticated ? (
+          <>
           <Layout.Wrap grid='golden-ratio'>
 
             <Layout.Module type='header'>
               <Header />
             </Layout.Module>
-    
+
             <Layout.Module type='content'>
               <BreadNav />
               <Outlet />
             </Layout.Module>
-    
+
             <Layout.Module type='sidebar'>
                 <Sidebar />
             </Layout.Module>
-    
+
             <Layout.Module type='footer'>
                 <Footer />
             </Layout.Module>
-    
+
           </Layout.Wrap>
+          <OverlayTransition  animate={visibility.transition} />
+          </>
         ):  (
           <Navigate to='/login' />
         ) 
