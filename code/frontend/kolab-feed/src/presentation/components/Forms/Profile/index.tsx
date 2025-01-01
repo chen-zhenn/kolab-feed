@@ -47,8 +47,7 @@ export function FormProfile(){
         if(response && response.status === 200)
             if(response.data && !!response.data.length) {
                 posts = response?.data
-                userData = { ...response?.data[0]['user'] }
-                userData.email = response?.data[0].email
+                userData = { ...response?.data[0].user }
             }
             if(user_id && (!response || response.status !== 200)) {
                 (async function (){

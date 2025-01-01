@@ -287,7 +287,7 @@ export class ServiceSupaBase {
             const userAuth = await ServiceSupaBase.getUserAuth()
             if (userAuth) {
                 const { id: user_id, email } = userAuth
-                return { ...payload, user_id, email }
+                return { ...payload, user_id }
             }
             return payload
         } catch (error) {
