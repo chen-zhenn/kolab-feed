@@ -15,6 +15,11 @@ import {
     Post,
     Profile, 
 } from '@/presentation/pages'
+
+import { 
+    Form, 
+} from '@/presentation/components'
+
 const post = makePost()
 
 const router = createBrowserRouter([{
@@ -74,6 +79,11 @@ const router = createBrowserRouter([{
     }, {
         path: '/profile',
         element: <Profile />,
+        children: [{
+            path: ':user_id',
+            loader: async ({ params }) => await post.filterByParams({ ...params }),
+            element: <Form.Profile />
+        }]
     }],
 }])
 
