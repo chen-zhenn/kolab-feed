@@ -1,4 +1,4 @@
-import { Avatar } from '@/presentation/components/_vendor'
+import { Avatar } from '@/presentation/components'
 import { IPostHeader } from './types'
 import { AvatarContainer } from './styles'
 

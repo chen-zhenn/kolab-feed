@@ -13,7 +13,7 @@ export const Section = styled.section<{ open?: boolean }>`
     &.-profile {
         position: relative;
         align-items: center;
-        z-index: 1;
+        z-index: 2;
 
         .card {
             position: absolute;
