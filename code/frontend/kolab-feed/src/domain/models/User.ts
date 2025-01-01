@@ -8,3 +8,11 @@ export interface IUsers extends IAuth {
     avatar?: string;
     created_at?: string;
 }
+
+export interface IUserData {
+    id?: string;
+    username?: string;
+    email?: string;
+    avatar?: string;
+    imageFile?: File;
+}
