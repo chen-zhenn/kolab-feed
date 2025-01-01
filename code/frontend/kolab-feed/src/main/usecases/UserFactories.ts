@@ -1,10 +1,14 @@
-import { IAuth } from '@/domain/models'
+import { 
+    IAuth,
+    IUserData, 
+} from '@/domain/models'
 
 import { 
     UseCaseUserLogin,
     UseCaseUserLogout,
     UseCaseGetUserAuth,
     UseCaseGetUsersById,
+    UseCaseUserUpdate,
 } from '@/main/usecases'
 
 export function makeUser() {
@@ -17,5 +21,6 @@ export function makeUser() {
         getById: (user_id: string) => 
             UseCaseGetUsersById(user_id),
         getUserAuth: UseCaseGetUserAuth,
+        update: (payload: IUserData) => UseCaseUserUpdate(payload), 
     }
 }

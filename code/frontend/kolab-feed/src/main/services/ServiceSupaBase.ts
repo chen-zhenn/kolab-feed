@@ -5,7 +5,8 @@ const {
 import { 
     IAuth, 
     IUsers,
-    IPostData, 
+    IPostData,
+    IUserData, 
 } from '@/domain/models'
 
 import { 
@@ -97,7 +98,7 @@ export class ServiceSupaBase {
                 payload.imageFile && 
                 payload.imageFile.type.includes('image')
             ) {
-                const imagePath = await this.handleUploadPostImage(payload.imageFile)
+                const imagePath = await this.handleUploadImage(payload.imageFile, 'post-image')
                 if(imagePath && !(imagePath instanceof Error)) newPayload.image = imagePath
             }
             if(typeof newPayload.image !== 'string') delete newPayload.image 
@@ -138,7 +139,7 @@ export class ServiceSupaBase {
                 payload.imageFile && 
                 payload.imageFile.type.includes('image')
             ) {
-                const imagePath = await this.handleUploadPostImage(payload.imageFile)
+                const imagePath = await this.handleUploadImage(payload.imageFile, 'post-image')
                 if(imagePath && !(imagePath instanceof Error)) newPayload.image = imagePath
             }
             if(typeof newPayload.image !== 'string') delete newPayload.image 
@@ -159,6 +160,55 @@ export class ServiceSupaBase {
 
         if(error) return HttpResponseHandler.handleError(error)
         return HttpResponseHandler.handleSuccess<IPostData>(data, 200, 'Post atualizado com sucesso!')
+    }
+
+    async updateUser<T>(payload: IUserData): Promise<IHttpResponse<T[]>> {
+        
+        if(
+            !payload || 
+            !Object.keys(payload).length ||
+            !payload.user_id || 
+            !payload.email
+        )
+            return HttpResponseHandler
+                .handleError({ error: { code: 'PGRST116' } })
+
+        const { data: authUserData, error: authUserError } = await SupaBaseClient
+            .auth
+            .updateUser({
+                email: payload.email,
+            })
+
+        if(authUserError) return HttpResponseHandler.handleError(authUserError)
+
+        //-IMAGE STORAGE
+        try {
+            if(
+                payload.imageFile && 
+                payload.imageFile.type.includes('image')
+            ) {
+                const imagePath = await this.handleUploadImage(payload.imageFile, 'avatar-image')
+                if(imagePath && !(imagePath instanceof Error)) payload.avatar = imagePath
+            }
+
+            if(typeof payload.avatar !== 'string') delete payload.avatar
+
+        } catch (error) {
+            delete payload.avatar
+        } finally {
+            delete payload.imageFile
+        }
+
+        const { id, ...newPayload } = payload
+
+        const { data, error } = await SupaBaseClient
+            .from(this.table)
+            .update(newPayload)
+            .eq('user_id', payload.user_id)
+            .select()
+
+        if(error) return HttpResponseHandler.handleError(error)
+        return HttpResponseHandler.handleSuccess<T>(data, 200, 'Usuário atualizado com sucesso!')
     }
 
    //================================================================//
@@ -265,11 +315,11 @@ export class ServiceSupaBase {
         return HttpResponseHandler.handleSuccess(data ?? [])
     }
 
-    private async handleUploadPostImage(imageFile: File): Promise<string | Error | null> {
+    private async handleUploadImage(imageFile: File, bucket: string): Promise<string | Error | null> {
         
         const { data: storageData, error: uploadError } = await SupaBaseClient
             .storage
-            .from('post-image')
+            .from(bucket)
             .upload(`${Date.now()}-${imageFile.name}`, imageFile, {
                 cacheControl: '3600',
                 upsert: false

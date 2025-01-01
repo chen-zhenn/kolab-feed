@@ -2,6 +2,8 @@ import { useState } from 'react'
 
 import { 
     useLoaderData,
+    redirect,
+    useNavigate,
 } from 'react-router'
 
 import { 
@@ -29,15 +31,24 @@ import { HttpStatusMessages } from '@/main/services'
 
 import { Utils } from '@/presentation/shared'
 
+import { 
+    Modal, 
+} from '@/presentation/components'
+
 import { Partial } from './Partials'
+import { Heading, Text } from './styles'
 
 export function FormProfile(){
 
     const user = makeUser()
     const { user_id } = useParams()
+    const nav = useNavigate()
+    const { revalidate, state } = useRevalidator()
     const response: IHttpResponse<IPost[]> = useLoaderData()
     const [profileData, setProfileData] = useState<IUserData>()
     const [imagePreview, setImagePreview] = useState<string>('')
+    const [loading, setLoading] = useState<boolean>(false)
+    const [open, setOpen] = useState<boolean>(false)
 
     const { launchToast } = Utils
     let posts: IPost[] = []
@@ -70,8 +81,8 @@ export function FormProfile(){
             message: HttpStatusMessages.servererror,
         }
         launchToast(response)
-    }  
-    
+    }
+        
     function handleFileChange(details: FileChangeDetails): void {
         const { acceptedFiles } = details
         if(!acceptedFiles.length) return
@@ -83,7 +94,6 @@ export function FormProfile(){
             ...profileData,
             imageFile, 
         })
-
     }
 
     function handleConfirmEditUserName(details: ValueChangeDetails): void {
@@ -92,7 +102,7 @@ export function FormProfile(){
             !Object.keys(details).length ||  
             typeof details?.value !== 'string'
         ) return
-        
+
         setProfileData({
             ...profileData,
             username: details?.value, 
@@ -113,9 +123,31 @@ export function FormProfile(){
         })
     }
 
-    function handleUpdateProfile(): void {
+    async function handleUpdateProfile(): Promise<any> {
         if(!profileData) return
-        console.log('=> profileData: ', profileData)
+        const payload = { 
+            ...profileData,
+            user_id: userData.user_id, 
+            email: profileData.email ?? userData.email, 
+        }
+        
+        try {
+            const response = await user.update(payload)
+            if(response) {
+                launchToast(response)
+                setOpen(true)
+            }   
+        } catch (error) {
+            const response = {
+                status: HttpStatusCode.servererror,
+                statusText: 'error',
+                message: HttpStatusMessages.servererror,
+            }
+            return launchToast(response)
+        } finally {
+            setImagePreview('')
+            setLoading(false)
+        }
     }
 
     return (
@@ -134,6 +166,31 @@ export function FormProfile(){
                     handleUpdateProfile,
                 }}  
             />
+
+            <Modal.Container 
+                open={open}
+                closeOnInteractOutside={true}
+                handlers={{
+                    onOpenChange: (details) => setOpen(details.open),
+                    onExitComplete: () => {
+                        console.log('Modal foi fechado!')
+                        revalidate()
+                    } 
+                }}
+            >
+                <Modal.Header>
+                    <Heading>
+                        Atualização realizada com sucesso!
+                    </Heading>
+                </Modal.Header>
+                <Modal.Content>
+                    <Text>
+                        Para concluir o processo, 
+                        por favor confirme a alteração através do link enviado por email.
+                    </Text>
+                </Modal.Content>
+                <Modal.Footer />
+            </Modal.Container>
         </>
     )
 }

@@ -1,6 +1,7 @@
 import { 
     IAuth,
     IUsers,
+    IUserData,
 } from '@/domain/models'
 
 import {  
@@ -26,4 +27,9 @@ export async function UseCaseGetUserAuth(): Promise<ISupaBaseUser | null> {
 
 export async function UseCaseGetUsersById(user_id: string): Promise<IHttpResponse<IUsers[]>>  {
     return ServiceSupaBase.getUsersById<IUsers>(user_id)
+}
+
+export async function UseCaseUserUpdate(payload: IUserData): Promise<IHttpResponse<IUserData[]>> {
+    const serviceSupaBase = new ServiceSupaBase('users')
+    return await serviceSupaBase.updateUser<IUserData>(payload)
 }

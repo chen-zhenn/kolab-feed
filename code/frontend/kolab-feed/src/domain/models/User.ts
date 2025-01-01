@@ -11,8 +11,10 @@ export interface IUsers extends IAuth {
 
 export interface IUserData {
     id?: string;
+    user_id?: string;
     username?: string;
     email?: string;
     avatar?: string;
     imageFile?: File;
+    created_at?: string;
 }

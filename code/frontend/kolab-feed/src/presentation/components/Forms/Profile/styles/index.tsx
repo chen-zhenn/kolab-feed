@@ -2,7 +2,8 @@ import styled from 'styled-components'
 
 import { 
     Card,
-    Heading as _Heading, 
+    Heading as _Heading,
+    Text as _Text, 
 } from '@chakra-ui/react'
 
 import { colors } from '@/presentation/theme'
@@ -69,4 +70,10 @@ export const AvatarEditIcon = styled.div`
     bottom: 0;
     font-size: 1.5rem;
     color: ${colors.secondary200};
+`
+
+export const Text = styled(_Text)`
+    font-size: 1.10rem;
+    color: ${colors.secondary200};
+    // color: inherit;
 `

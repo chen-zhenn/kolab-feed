@@ -21,7 +21,7 @@ export default function ModalFooter({
                     color='white' 
                     backgroundColor='blue.500'
                     >
-                        Cancelar
+                        Fechar
                 </Button>
             </DialogActionTrigger>
         </DialogFooter>
