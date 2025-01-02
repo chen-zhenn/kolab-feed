@@ -17,7 +17,9 @@ export interface IContentHandlers {
 }
 
 export interface IFormProfileContent {
-    posts: IPost[];
+    loading: boolean;
+    updating: boolean;
+    posts?: IPost[];
     user: IUserData;
     handlers: IContentHandlers;
 }

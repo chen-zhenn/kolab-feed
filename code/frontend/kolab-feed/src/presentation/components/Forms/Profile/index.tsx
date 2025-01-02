@@ -1,26 +1,24 @@
-import { useState } from 'react'
+import { 
+    useEffect, 
+    useState,
+} from 'react'
 
 import { 
-    useLoaderData,
-    redirect,
     useNavigate,
 } from 'react-router'
 
 import { 
     useParams,
-    useRevalidator,
 } from 'react-router'
 
 import { ValueChangeDetails } from '@zag-js/editable'
 
 import { 
-    IPost, 
     IUserData, 
 } from '@/domain/models'
 
 import {
-    HttpStatusCode, 
-    IHttpResponse, 
+    HttpStatusCode,  
 } from '@/infra'
 
 import {
@@ -32,7 +30,8 @@ import { HttpStatusMessages } from '@/main/services'
 import { Utils } from '@/presentation/shared'
 
 import { 
-    Modal, 
+    Modal,
+    Toaster, 
 } from '@/presentation/components'
 
 import { Partial } from './Partials'
@@ -43,44 +42,50 @@ export function FormProfile(){
     const user = makeUser()
     const { user_id } = useParams()
     const nav = useNavigate()
-    const { revalidate, state } = useRevalidator()
-    const response: IHttpResponse<IPost[]> = useLoaderData()
-    const [profileData, setProfileData] = useState<IUserData>()
+    const [profileData, setProfileData] = useState<IUserData>({})
     const [imagePreview, setImagePreview] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(false)
+    const [updating, setUpdating] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(false)
 
     const { launchToast } = Utils
-    let posts: IPost[] = []
-    let userData: IUserData = {}
 
-    try {
-        if(response && response.status === 200)
-            if(response.data && !!response.data.length) {
-                posts = response?.data
-                userData = { ...response?.data[0].user }
+    useEffect(() => {
+        (async function(){
+           try {
+                setLoading(true)
+                const userData = await fetchUserData()
+                setProfileData({
+                    ...profileData,
+                    ...userData,
+                })
+           } catch (error) {
+                const response = {
+                    status: HttpStatusCode.servererror,
+                    statusText: 'error',
+                    message: HttpStatusMessages.servererror,
+                }
+                launchToast(response)
+           } finally { setLoading(false) }
+        }())
+    }, [])
+
+    async function fetchUserData() {
+        
+        if(!user_id) return
+        const response = await user.getById(user_id)
+        
+        if(response && response.status === 200) {
+           
+            if(response.data && !!response.data.length){
+                const { id, created_at, ...data } = response.data[0]
+                return data
             }
-            if(user_id && (!response || response.status !== 200)) {
-                (async function (){
-                    const response = await user.getById(user_id)
-                    if(response && response.status === 200) {
-                        if(response.data && !!response.data.length){
-                            const { id, created_at, ...data } = response.data[0]
-                            userData = { ...data }
-                        }
-                    }
-                    if(response.status !== 200) launchToast(response)
-                }()) 
-            }
-        launchToast(response)
-            
-    } catch (error) {
-        const response = {
-            status: HttpStatusCode.servererror,
-            statusText: 'error',
-            message: HttpStatusMessages.servererror,
         }
-        launchToast(response)
+        if(response.status !== 200) {
+            launchToast(response)
+            return {}
+        }
     }
         
     function handleFileChange(details: FileChangeDetails): void {
@@ -125,15 +130,12 @@ export function FormProfile(){
 
     async function handleUpdateProfile(): Promise<any> {
         if(!profileData) return
-        const payload = { 
-            ...profileData,
-            user_id: userData.user_id, 
-            email: profileData.email ?? userData.email, 
-        }
-        
+        const payload = { ...profileData }        
         try {
+            setUpdating(true)
             const response = await user.update(payload)
             if(response) {
+                if(response.status !== 200) return launchToast(response)
                 launchToast(response)
                 setOpen(true)
             }   
@@ -146,6 +148,7 @@ export function FormProfile(){
             return launchToast(response)
         } finally {
             setImagePreview('')
+            setUpdating(false)
             setLoading(false)
         }
     }
@@ -153,13 +156,14 @@ export function FormProfile(){
     return (
         <>
             <Partial.ProfileHeader 
-                avatar={imagePreview ? imagePreview : userData?.avatar} 
+                avatar={imagePreview ? imagePreview :profileData?.avatar}
                 handleFileChange={handleFileChange}  
             />
 
-            <Partial.ProfileContent 
-                posts={posts} 
-                user={userData}
+            <Partial.ProfileContent
+                loading={loading}
+                updating={updating} 
+                user={profileData}
                 handlers={{
                     handleConfirmEditUserName,
                     handleConfirmEditEmail,
@@ -173,8 +177,9 @@ export function FormProfile(){
                 handlers={{
                     onOpenChange: (details) => setOpen(details.open),
                     onExitComplete: () => {
-                        revalidate()
-                    } 
+                        localStorage.clear()
+                        setTimeout(() => nav('/'), 1445)
+                    }
                 }}
             >
                 <Modal.Header>
@@ -190,6 +195,7 @@ export function FormProfile(){
                 </Modal.Content>
                 <Modal.Footer />
             </Modal.Container>
+            <Toaster /> 
         </>
     )
 }

@@ -180,22 +180,30 @@ export default function Btn({
             <Button
                 size={size}
                 variant='outline'
-                color='white' 
-                backgroundColor='blue.500'
+                color={state?.disabled ? 'gray.500' : 'white'} 
+                backgroundColor={state?.disabled ? 'gray.300' : 'blue.500'}
+                borderColor={state?.disabled ? 'gray.300' : 'blue.500'}
+                cursor={state?.disabled ? 'disabled' : 'pointer'}
                 disabled={state?.disabled}
+                loading={state?.loading}
+                loadingText={loadingLabel}
+                _disabled={{
+                    borderColor: 'transparent',
+                }}
                 _hover={{
                     outlineColor:'transparent',
                     borderColor: 'transparent',
                     outline: 'none',
                     color: 'blue.700',
                 }}
-                _focus={{
+                  _focus={{
                     outlineWidth: '1px',
                     outlineColor:'transparent',
+                    borderColor: 'transparent',
                 }}
-                _focusVisible={{
-                    outlineWidth: '1px',
-                    outlineColor:'transparent',
+                  _focusVisible={{
+                      outlineWidth: '1px',
+                      outlineColor:'transparent',
                 }}
                 onClick={handlers?.onclick}
             >

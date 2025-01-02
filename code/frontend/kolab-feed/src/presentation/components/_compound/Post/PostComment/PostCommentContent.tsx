@@ -2,10 +2,6 @@ import { useState } from 'react'
 
 import { ValueChangeDetails } from '@zag-js/editable'
 
-import {
-    Box,
-} from '@chakra-ui/react'
-
 import { 
     EditableField,
     Action, 

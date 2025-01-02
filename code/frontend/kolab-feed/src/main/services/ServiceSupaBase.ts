@@ -179,7 +179,16 @@ export class ServiceSupaBase {
                 email: payload.email,
             })
 
-        if(authUserError) return HttpResponseHandler.handleError(authUserError)
+        if(authUserError) {
+            if(/AuthApiError: A user with this email address has already been registered/.test(authUserError)){
+                return {
+                    status: 409,
+                    statusText: 'error',
+                    message: `Este email ${payload.email} já está cadastrado!`
+                }
+            }
+            return HttpResponseHandler.handleError(authUserError)
+        }
 
         //-IMAGE STORAGE
         try {
