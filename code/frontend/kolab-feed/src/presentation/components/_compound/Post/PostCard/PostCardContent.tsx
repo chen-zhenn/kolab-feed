@@ -3,7 +3,12 @@ import {
 } from '@chakra-ui/react'
 
 import { IPostCard } from './types'
-import { ContentSection } from './styles'
+
+import { 
+    ContentSection,
+    ContentSectionHeader,
+    Heading,
+} from './styles'
 
 export default function PostCardContent({
     content,
@@ -11,8 +16,16 @@ export default function PostCardContent({
  }:  IPostCard) {
     return (
         <Card.Body>
-            <ContentSection>{content}</ContentSection>
-            <ContentSection>{comment}</ContentSection>
+            <ContentSection>
+                {content}
+            </ContentSection>
+
+            <ContentSection>
+                <ContentSectionHeader>
+                    <Heading size='md'>Comentários</Heading>
+                </ContentSectionHeader>
+                {comment}
+            </ContentSection>
         </Card.Body>
     )
 }

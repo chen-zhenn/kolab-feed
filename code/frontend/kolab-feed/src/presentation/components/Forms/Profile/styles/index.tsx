@@ -75,5 +75,4 @@ export const AvatarEditIcon = styled.div`
 export const Text = styled(_Text)`
     font-size: 1.10rem;
     color: ${colors.secondary200};
-    // color: inherit;
 `

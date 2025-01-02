@@ -173,7 +173,6 @@ export function FormProfile(){
                 handlers={{
                     onOpenChange: (details) => setOpen(details.open),
                     onExitComplete: () => {
-                        console.log('Modal foi fechado!')
                         revalidate()
                     } 
                 }}

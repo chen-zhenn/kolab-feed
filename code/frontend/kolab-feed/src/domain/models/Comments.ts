@@ -1,7 +1,10 @@
-export interface IComments {
+export interface ICommentData {
+    user_id?: string;
+    post_id?: number;
+    body?: string;
+}
+
+export interface IComments extends ICommentData {
     id: string;
-    user_id: string;
-    post_id: string;
-    body: string;
     created_at?: string;
 }

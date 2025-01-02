@@ -15,18 +15,20 @@ import {
 import {
     ActionType,
     IHandlers, 
-    IBtn, 
+    IBtn,
+    Size, 
 } from './types'
 
 export default function Btn({
     label,
     loadingLabel, 
     actionType,
+    size,
     state,
     handlers,
  }: IBtn){
     
-    function setButton(type?: ActionType, handlers?: IHandlers): React.ReactElement {
+    function setButton(type?: ActionType, handlers?: IHandlers, size?: Size): React.ReactElement {
         const buttons = {
           edit: 
             <Button 
@@ -175,7 +177,8 @@ export default function Btn({
                 </FileUploadTrigger>
             </FileUploadRoot>,
             default: 
-            <Button 
+            <Button
+                size={size}
                 variant='outline'
                 color='white' 
                 backgroundColor='blue.500'
@@ -204,6 +207,6 @@ export default function Btn({
     }
 
     return (
-        <>{setButton(actionType, handlers)}</>
+        <>{setButton(actionType, handlers, size)}</>
     )
 }

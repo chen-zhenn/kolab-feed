@@ -1,25 +1,36 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+
+const EmptyElem = css`
+    content: '';
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+`
+
+const ThinBorder = css`
+    ${EmptyElem};
+    width: 100%;
+    height: 1px;
+    background-color: var(--chakra-colors-gray-200);
+`
 
 export const Header = styled.header`
     margin-bottom: .85rem;
 `
-
 export const Container = styled.aside`
     padding-top: 1.75rem;
     
     &:before {
-        content: '';
-        position: absolute;
-        display: block;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 1px;
-        background-color: rgba(228, 228, 231, 1);
+        ${ThinBorder};
     }
 `
 
-export const Label = styled.span`
-    font-weight: bold;
-    color: rgba(0, 0, 0, .6); 
+export const ContentSection = styled.section`
+    padding: .85rem;
+`
+
+export const ActionContainer = styled.div`
+    margin-top: .85rem;
+    text-align: right;
 `

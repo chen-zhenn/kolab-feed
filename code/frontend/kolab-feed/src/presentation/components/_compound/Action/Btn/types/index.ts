@@ -1,4 +1,5 @@
  export type ActionType = 'edit' | 'cancel' | 'confirm' | 'submit' | 'upload'
+ export type Size = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'xs' | '2xs' | undefined
 
  export interface IHandlers {
     onEdit?: () => void;
@@ -21,5 +22,5 @@ export interface IBtn {
     actionType?: ActionType;
     state?: IState;
     handlers?: IHandlers;
-    // size?:  
+    size?: Size;  
 }

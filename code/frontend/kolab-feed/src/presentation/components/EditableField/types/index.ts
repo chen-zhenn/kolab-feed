@@ -11,7 +11,7 @@ export interface ITriggerElement {
 
 export interface IHandlers {
     onConfirm?: (details: ValueChangeDetails) => void;
-    onChange?: () => void;
+    onChange?: (details: ValueChangeDetails) => void;
 }
 
 export interface ITriggers {
