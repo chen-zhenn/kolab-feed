@@ -22,6 +22,7 @@ export interface ITriggers {
 
 export interface IEditableField {
     labelField: string;
+    valueField?: string;
     fieldType: FieldTypes;
     triggers: ITriggers;
     handlers?: IHandlers;

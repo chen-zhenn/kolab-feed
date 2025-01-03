@@ -3,7 +3,8 @@ import { ValueChangeDetails } from '@zag-js/editable'
 import { 
     IPost,
     IPostData,
-    IComments, 
+    IComments,
+    ICommentData, 
 } from '@/domain/models'
 
 export type CrudAction = 'add' | 'edit' | 'delete'

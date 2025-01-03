@@ -15,6 +15,7 @@ import {
 import { ValueChangeDetails } from '@zag-js/editable'
 
 import { 
+    ICommentData,
     IComments,
     IPost,
     IPostData, 
@@ -62,6 +63,8 @@ export default function Post() {
         body: 'Comece a escrever sua publicação',
         image: ''
     })
+
+    const [commentData, setCommentData] =  useState<ICommentData>()
 
     const { launchToast } = Utils
     let posts: IPost[] = []
@@ -115,7 +118,6 @@ export default function Post() {
         return (
             <PostComment.Container key={comment.id}>
                 <PostComment.Header>{  handlePostHeaderBody(post) }</PostComment.Header>
-                <PostComment.Content contentValue={comment.body} />
             </PostComment.Container>
         )
     }
@@ -221,6 +223,7 @@ export default function Post() {
             setModalOptions({ title: 'Complete o Cadastro' })
         } 
     }
+
     
     return (
         <>
@@ -233,7 +236,7 @@ export default function Post() {
                             handlePostHeaderBody,
                             handlePostContentBody,
                             handlePostCommentBody,
-                            handleConfirmBodyPost 
+                            handleConfirmBodyPost,
                         }} 
                     />
                 )
@@ -247,7 +250,7 @@ export default function Post() {
                         handlePostHeaderBody,
                         handlePostContentBody,
                         handlePostCommentBody,
-                        handleConfirmBodyPost
+                        handleConfirmBodyPost,
                     }} 
                 />
                 )

@@ -18,6 +18,7 @@ import {
 
 export function EditableField({
   labelField,
+  valueField,
   fieldType,
   triggers,
   handlers,
@@ -119,6 +120,7 @@ export function EditableField({
   return (
     <Editable.Root
       defaultValue={labelField}
+      value={valueField}
       onValueCommit={handlers?.onConfirm}
       onValueChange={handlers?.onChange}
     >
