@@ -3,10 +3,10 @@ const {
 } = import.meta.env
 
 import { 
-    IAuth, 
-    IUsers,
+    IAuth,
     IPostData,
-    IUserData, 
+    IUserData,
+    ICommentData, 
 } from '@/domain/models'
 
 import { 
@@ -90,7 +90,7 @@ export class ServiceSupaBase {
 
     async createPost<T>(payload: IPostData): Promise<IHttpResponse<IPostData[]>> {
         //-USER
-        const newPayload = await this.handleUserPayload(payload)
+        const newPayload = await this.handleUserPayload<IPostData>(payload)
         
         //-IMAGE STORAGE
         try {
@@ -119,6 +119,24 @@ export class ServiceSupaBase {
 
         if(error) return HttpResponseHandler.handleError(error)
         return HttpResponseHandler.handleSuccess<IPostData>(data, 201, 'Post publicado com sucesso!')
+    }
+
+    async createComment<T>(payload: ICommentData): Promise<IHttpResponse<T[]>> {
+        if(!payload || !Object.keys(payload).length) 
+            return HttpResponseHandler
+                .handleError({ error: { code: '22P02' } })
+
+        //-USER
+        const newPayload = await this.handleUserPayload(payload)
+
+        //-COMMENT
+        const { data, error } = await SupaBaseClient
+            .from(this.table)
+            .insert([newPayload])
+            .select()
+
+        if(error) return HttpResponseHandler.handleError(error)
+        return HttpResponseHandler.handleSuccess<T>(data, 201, 'Comentário publicado com sucesso!')
     }
 
    //================================================================//
@@ -341,11 +359,11 @@ export class ServiceSupaBase {
             : null
     }
 
-    private async handleUserPayload(payload: IPostData): Promise<IPostData> {
+    private async handleUserPayload<T>(payload: T): Promise<T> {
         try {
             const userAuth = await ServiceSupaBase.getUserAuth()
             if (userAuth) {
-                const { id: user_id, email } = userAuth
+                const { id: user_id, } = userAuth
                 return { ...payload, user_id }
             }
             return payload

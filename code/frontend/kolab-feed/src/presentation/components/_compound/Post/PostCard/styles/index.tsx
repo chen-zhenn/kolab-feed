@@ -44,6 +44,9 @@ export const PostCardContainer = styled.article`
 export const ContentSection = styled.section`
     position: relative;
 `
+export const ContentSectionPost = styled(ContentSection)``
+
+export const ContentSectionComment = styled(ContentSection)``
 
 export const ContentSectionHeader = styled.header`
     padding-top: .85rem;

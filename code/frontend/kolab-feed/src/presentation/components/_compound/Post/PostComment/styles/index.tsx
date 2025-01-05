@@ -18,7 +18,7 @@ const ThinBorder = css`
 export const Header = styled.header`
     margin-bottom: .85rem;
 `
-export const Container = styled.aside`
+export const Container = styled.article`
     padding-top: 1.75rem;
     
     &:before {
@@ -28,9 +28,4 @@ export const Container = styled.aside`
 
 export const ContentSection = styled.section`
     padding: .85rem;
-`
-
-export const ActionContainer = styled.div`
-    margin-top: .85rem;
-    text-align: right;
 `

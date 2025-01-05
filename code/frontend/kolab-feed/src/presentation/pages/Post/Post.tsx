@@ -14,9 +14,7 @@ import {
 
 import { ValueChangeDetails } from '@zag-js/editable'
 
-import { 
-    ICommentData,
-    IComments,
+import {
     IPost,
     IPostData, 
 } from '@/domain/models'
@@ -34,7 +32,6 @@ import { Utils } from '@/presentation/shared'
 import { 
     PostHeader,
     PostContent,
-    PostComment,
     Modal,
     Form,
     Toaster,
@@ -63,8 +60,6 @@ export default function Post() {
         body: 'Comece a escrever sua publicação',
         image: ''
     })
-
-    const [commentData, setCommentData] =  useState<ICommentData>()
 
     const { launchToast } = Utils
     let posts: IPost[] = []
@@ -110,15 +105,6 @@ export default function Post() {
                 <PostContent.Description description={post.body} />
                 <PostContent.Image imageSource={post.image} />
             </PostContent.Container>
-        )
-    }
-
-    function handlePostCommentBody(comment: IComments): React.ReactNode {
-        const post = posts.filter(item => item.user_id === comment.user_id)[0]
-        return (
-            <PostComment.Container key={comment.id}>
-                <PostComment.Header>{  handlePostHeaderBody(post) }</PostComment.Header>
-            </PostComment.Container>
         )
     }
 
@@ -235,7 +221,6 @@ export default function Post() {
                         handlers={{ 
                             handlePostHeaderBody,
                             handlePostContentBody,
-                            handlePostCommentBody,
                             handleConfirmBodyPost,
                         }} 
                     />
@@ -249,7 +234,6 @@ export default function Post() {
                     handlers={{
                         handlePostHeaderBody,
                         handlePostContentBody,
-                        handlePostCommentBody,
                         handleConfirmBodyPost,
                     }} 
                 />

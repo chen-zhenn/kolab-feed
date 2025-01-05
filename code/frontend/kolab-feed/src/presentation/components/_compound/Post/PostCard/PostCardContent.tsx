@@ -6,6 +6,8 @@ import { IPostCard } from './types'
 
 import { 
     ContentSection,
+    ContentSectionPost,
+    ContentSectionComment,
     ContentSectionHeader,
     Heading,
 } from './styles'
@@ -16,16 +18,16 @@ export default function PostCardContent({
  }:  IPostCard) {
     return (
         <Card.Body>
-            <ContentSection>
+            <ContentSectionPost>
                 {content}
-            </ContentSection>
+            </ContentSectionPost>
 
-            <ContentSection>
+            <ContentSectionComment>
                 <ContentSectionHeader>
                     <Heading size='md'>Comentários</Heading>
                 </ContentSectionHeader>
                 {comment}
-            </ContentSection>
+            </ContentSectionComment>
         </Card.Body>
     )
 }
