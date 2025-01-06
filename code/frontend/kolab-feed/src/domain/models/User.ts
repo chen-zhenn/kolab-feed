@@ -2,7 +2,7 @@ import { IAuth } from './Auth'
 import { ICommentData } from './Comments';
 
 export interface IUsers extends IAuth {
-    id: string;
+    id?: string;
     post_id: number;
     user_id: string;
     username: string;

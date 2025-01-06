@@ -53,14 +53,27 @@ const router = createBrowserRouter([{
     },{
         path: '/posts',
         element: <Post />,
-        loader: async ({ params }) => {
-            if (!Object.keys(params).length) return await post.getAll()
+        loader: async ({ params, request }) => {
+            const searchParams = new URLSearchParams(new URL(request.url).search)
+            const title = searchParams.get('title')
+            const body = searchParams.get('body')
+            
+            if (
+                !Object.keys(params).length &&
+                !searchParams.size
+            ) return await post.getAll()
+
+            // if(title && body ) 
+            //     return await post.filterByParams({ title, body })
+            
             return await post.filterByParams({ ...params })
         },
         children: [{
             path: 'edit/:id',
         },{
             path: 'delete/:id',
+        },{
+            path: '?title',
         },{
             path: 'user',
             children: [{

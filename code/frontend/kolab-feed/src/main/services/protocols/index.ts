@@ -1,10 +1,14 @@
 import { HttpStatusCode } from '@/infra'
 
 export interface IHttpPostQueryParams {
-    user_id?: string;
     id?: number;
+    user_id?: string;
     title?: string;
     body?: string;
+    users?: {
+        username?: string;
+        email?: string;
+    };
     q?: string;
 }
 
