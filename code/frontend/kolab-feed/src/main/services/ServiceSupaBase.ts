@@ -305,6 +305,20 @@ export class ServiceSupaBase {
         return HttpResponseHandler.handleSuccess([], 204, 'Post deletado com sucesso!')
     }
 
+    async deleteComment<T>(column: Record<string, number>): Promise<IHttpResponse<T[]>> {
+        
+        const [key, value] = Object.entries(column)[0]
+
+        const { error } = await SupaBaseClient
+            .from(this.table)
+            .delete()
+            .eq(key, value)
+
+        if(error) return HttpResponseHandler.handleError(error)
+        return HttpResponseHandler.handleSuccess([], 204, 'Comentário deletado com sucesso!')
+
+    }
+
     async filteringPostByParams<T>(
         column: Partial<Record<keyof IHttpPostQueryParams, string | number>>
     ): Promise<IHttpResponse<T[]>> {

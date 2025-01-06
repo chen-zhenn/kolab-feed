@@ -3,7 +3,8 @@ import {
 } from '@/domain/models'
 
 import { 
-    UseCaseCreateComment, 
+    UseCaseCreateComment,
+    UseCaseDeleteComment, 
 } from '@/main/usecases'
 
 export function makeComment() {
@@ -11,5 +12,7 @@ export function makeComment() {
     return {
         create: (commentData: ICommentData) => 
             UseCaseCreateComment(commentData),
+        delete: (column: Record<string, number>) => 
+            UseCaseDeleteComment(column),
     }
 }

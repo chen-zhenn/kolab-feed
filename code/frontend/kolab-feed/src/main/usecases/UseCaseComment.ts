@@ -15,3 +15,9 @@ export async function UseCaseCreateComment(commentData: ICommentData): Promise<I
     const data = await serviceSupaBase.createComment<ICommentData>(commentData)
     return data
 }
+
+export async function UseCaseDeleteComment(column: Record<string, number>): Promise<IHttpResponse<ICommentData[]>> {
+    const serviceSupaBase = new ServiceSupaBase('comments')
+    const data = await serviceSupaBase.deleteComment<ICommentData>(column)
+    return data
+}
