@@ -5,6 +5,8 @@ import {
 
 import { 
     useRevalidator,
+    useNavigate,
+    useLocation,
 } from 'react-router'
 
 import { ValueChangeDetails } from '@zag-js/editable'
@@ -36,11 +38,12 @@ import {
     PostComment,
     EditableField,
     Modal,
+    Form,
 } from '@/presentation/components'
 
 import { IPostPage } from '../types'
 
-export interface IUserDataComments extends IUserData {
+export interface IUserDataComment extends IUserData {
     post_id?: number;
     comment_id?: number;
     comment_body?: string;
@@ -53,12 +56,16 @@ export default function PostBodyPart({
 
     const user = makeUser()
     const comment = makeComment()
+    const nav = useNavigate()
+    const { pathname } = useLocation()
     const { revalidate, state } = useRevalidator()
     const { launchToast } = Utils
     const posts = data
-    const [userData, setUserData] = useState<IUserDataComments[]>([])
+    const [userCommentData, setUserCommentData] = useState<IUserDataComment[]>([])
     const [commentFieldLabel, setCommentFieldLabel] = useState<string>('Adicionar comentário')
+    const [commentData, setCommentData] = useState<ICommentData>()
     const [loading, setLoading] = useState<boolean>(false)
+    const [open, setOpen] = useState<boolean>(false)
 
     useEffect(() => {
         if (!posts || !posts.length) return
@@ -66,9 +73,37 @@ export default function PostBodyPart({
         loadUserData(comments)
     }, [posts])
 
+    function handleUpdateComment(userCommentData: IUserDataComment): void {
+        
+        if(
+            !userCommentData ||
+            !userCommentData.comment_id ||
+            !Object.keys(userCommentData).length
+        ) return
+
+        const { 
+            comment_id: id, 
+            comment_body: body, 
+            user_id, 
+            post_id, 
+        } = userCommentData
+
+        setCommentData({
+            id,
+            body,
+            user_id,
+            post_id,
+        })
+
+        nav(`${pathname.replace(/\/(add|edit|delete)\/?.*/, '')}/edit/${id}`)
+        setOpen(true)
+
+    }
     
     async function loadUserData(comments: ICommentData[]): Promise<void> {
-        const promiseData: Promise<IUserDataComments | undefined>[] = comments.map(async (comment) => {
+        const promiseData: 
+        Promise<IUserDataComment | undefined>[] = 
+        comments.map(async (comment) => {
 
             if (!comment.user_id) return
             const response = await user.getById(comment.user_id)
@@ -86,10 +121,13 @@ export default function PostBodyPart({
         })
 
         const userData = await Promise.all(promiseData)
-        setUserData(userData.filter(Boolean) as IUserDataComments[])
+        setUserCommentData(userData.filter(Boolean) as IUserDataComment[])
     }
 
-    async function handleConfirmBodyComment(details: ValueChangeDetails, post_id: number): Promise<IHttpResponse<ICommentData[]> | any> {        
+    async function handleConfirmBodyComment(
+        details: ValueChangeDetails, 
+        post_id: number
+    ): Promise<IHttpResponse<ICommentData[]> | any> {        
         if(!details || !details.value.length) return
         
         const payload = { post_id, body: details.value }
@@ -139,27 +177,27 @@ export default function PostBodyPart({
 
     function renderCommentContent(post: IPost): React.ReactNode {
 
-        if(!userData.length) return
+        if(!userCommentData.length) return
         
         return (
             <>
                 {
-                    userData
-                        .filter(user => user.post_id === post.id)
-                        .map((user, index) => (
-                            <PostComment.Container key={`${index}-user-${user.id}`}>
+                    userCommentData
+                        .filter(userComment => userComment.post_id === post.id)
+                        .map((userComment, index) => (
+                            <PostComment.Container key={`${index}-user-${userComment.id}`}>
 
                                 <PostComment.Header>
-                                    <PostHeader.Container key={user.id}>
-                                        <PostHeader.Avatar imageSource={user.avatar} />
-                                        <PostHeader.Title title={user.username} />
+                                    <PostHeader.Container key={userComment.id}>
+                                        <PostHeader.Avatar imageSource={userComment.avatar} />
+                                        <PostHeader.Title title={userComment.username} />
                                         { 
                                             !loading && 
                                             (
                                                 <PostHeader.Action 
                                                     action={true} 
-                                                    handleEdit={() => console.log(`Editar comentário: ${user.comment_id}`)}
-                                                    handleDelete={() => handleDeleteComment(user.comment_id)} 
+                                                    handleEdit={() => handleUpdateComment(userComment)}
+                                                    handleDelete={() => handleDeleteComment(userComment.comment_id)} 
                                                 />
                                             ) 
                                         }
@@ -167,7 +205,7 @@ export default function PostBodyPart({
                                 </PostComment.Header>
 
                                 <PostComment.Content 
-                                    comment={user?.comment_body} 
+                                    comment={userComment?.comment_body} 
                                 />
 
                             </PostComment.Container>
@@ -224,8 +262,27 @@ export default function PostBodyPart({
                     </PostCard.Container>
                ))
             }
-            <Modal.Container>
-                <Modal.Header />
+            <Modal.Container 
+                open={open} 
+                closeOnInteractOutside={true}
+                scrollBehavior='inside'
+                handlers={{
+                    onOpenChange: (details) => setOpen(details.open),
+                    onExitComplete: () => {
+                        nav(`${pathname.replace(/\/(add|edit|delete|posts|user)\/?.*/, '')}`)
+                    }
+                }}
+            >
+                <Modal.Header>
+                    <Modal.Title title='Atualizar Comentário' />
+                </Modal.Header>
+
+                <Modal.Content>
+                    <Form.Comment 
+                        data={commentData}
+                        handlers={{ onCancel: () => setOpen(false) }} 
+                    />
+                </Modal.Content>
             </Modal.Container>
         </>
     )

@@ -4,8 +4,7 @@ import {
 
 import { IPostCard } from './types'
 
-import { 
-    ContentSection,
+import {
     ContentSectionPost,
     ContentSectionComment,
     ContentSectionHeader,
