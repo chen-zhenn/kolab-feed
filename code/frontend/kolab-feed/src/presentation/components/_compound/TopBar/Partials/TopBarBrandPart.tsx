@@ -1,7 +1,3 @@
-const { 
-    VITE_APP_BASE_URL 
-} = import.meta.env
-
 import { 
     useNavigate,
 } from 'react-router'
@@ -20,8 +16,8 @@ export default function TopBarBrandPart() {
 
     return (
         <Section>
-            <Image 
-                src={`${VITE_APP_BASE_URL}/logo.svg`} 
+            <Image
+                src={`/logo.svg`} 
                 onClick={() => nav('/feed')} style={{ cursor: 'pointer' }} 
             />
         </Section>
