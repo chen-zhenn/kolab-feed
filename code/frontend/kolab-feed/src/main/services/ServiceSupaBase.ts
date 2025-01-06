@@ -340,6 +340,8 @@ export class ServiceSupaBase {
     async filteringPostByParams<T>(
         column: Partial<Record<keyof IHttpPostQueryParams, string | number>>
     ): Promise<IHttpResponse<T[]>> {
+        console.log('filteringPostByParams...')
+        console.log('=> column: ', column)
 
         let query = SupaBaseClient
             .from(this.table)
@@ -350,8 +352,14 @@ export class ServiceSupaBase {
 
         if(Object.keys(column).length) {
             for(const [key, value] of Object.entries(column)) 
-                if (value !== undefined) query = query.eq(key, value)
+                if (value !== undefined) {
+                    query = typeof value === 'string' && key !== 'user_id' ? 
+                    query.ilike(key, `%${value}%`) : 
+                    query.eq(key, value)
+                }
         }
+
+        console.log('=> query: ', query)
         
         const { data: posts, error } = await query
 

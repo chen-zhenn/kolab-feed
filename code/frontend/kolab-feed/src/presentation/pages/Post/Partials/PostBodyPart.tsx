@@ -94,10 +94,7 @@ export default function PostBodyPart({
             user_id,
             post_id,
         })
-
-        nav(`${pathname.replace(/\/(add|edit|delete)\/?.*/, '')}/edit/${id}`)
         setOpen(true)
-
     }
     
     async function loadUserData(comments: ICommentData[]): Promise<void> {
