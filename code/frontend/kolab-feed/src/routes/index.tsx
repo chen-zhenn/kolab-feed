@@ -84,6 +84,9 @@ const router = createBrowserRouter([{
             loader: async ({ params }) => await post.filterByParams({ ...params }),
             element: <Form.Profile />
         }]
+    }, {
+        path: '*',
+        element: 'Ops! - Parece que você se perdeu... Essa pagina não existe!',
     }],
 }])
 
