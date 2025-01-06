@@ -35,6 +35,7 @@ import {
     PostHeader,
     PostComment,
     EditableField,
+    Modal,
 } from '@/presentation/components'
 
 import { IPostPage } from '../types'
@@ -88,6 +89,54 @@ export default function PostBodyPart({
         setUserData(userData.filter(Boolean) as IUserDataComments[])
     }
 
+    async function handleConfirmBodyComment(details: ValueChangeDetails, post_id: number): Promise<IHttpResponse<ICommentData[]> | any> {        
+        if(!details || !details.value.length) return
+        
+        const payload = { post_id, body: details.value }
+        setLoading(true)
+
+        try {
+            const response = await comment.create(payload)
+            if(response) {
+                launchToast(response)
+                setTimeout(() => revalidate(), 250)
+            }
+        } catch (error) {
+            const response = {
+                status: HttpStatusCode.servererror,
+                statusText: 'error',
+                message: HttpStatusMessages.servererror,
+            }
+            return launchToast(response)
+        } finally {
+            setCommentFieldLabel('Adicionar comentário')
+            setLoading(false)
+        }
+    }
+
+    async function handleDeleteComment(comment_id?: number): Promise<void> {
+        
+        if(!comment_id) return
+        setLoading(true)
+        
+        try {
+            const response = await comment.delete({  id: comment_id })
+            if(response) {
+                launchToast(response)
+                setTimeout(() => revalidate(), 250)
+            }
+        } catch (error) {
+            const response = {
+                status: HttpStatusCode.servererror,
+                statusText: 'error',
+                message: HttpStatusMessages.servererror,
+            }
+            return launchToast(response)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     function renderCommentContent(post: IPost): React.ReactNode {
 
         if(!userData.length) return
@@ -104,11 +153,16 @@ export default function PostBodyPart({
                                     <PostHeader.Container key={user.id}>
                                         <PostHeader.Avatar imageSource={user.avatar} />
                                         <PostHeader.Title title={user.username} />
-                                        <PostHeader.Action 
-                                            action={true} 
-                                            handleEdit={() => console.log(`Editar comentário: ${user.comment_id}`)}
-                                            handleDelete={() => console.log(`Deletar comentário: ${user.comment_id}`)} 
-                                        />
+                                        { 
+                                            !loading && 
+                                            (
+                                                <PostHeader.Action 
+                                                    action={true} 
+                                                    handleEdit={() => console.log(`Editar comentário: ${user.comment_id}`)}
+                                                    handleDelete={() => handleDeleteComment(user.comment_id)} 
+                                                />
+                                            ) 
+                                        }
                                     </PostHeader.Container>
                                 </PostComment.Header>
 
@@ -121,30 +175,6 @@ export default function PostBodyPart({
                 }
             </>
           )
-    }
-
-    async function handleConfirmBodyComment(details: ValueChangeDetails, post_id: number): Promise<IHttpResponse<ICommentData[]> | any> {        
-        if(!details || !details.value.length) return
-        
-        const payload = { post_id, body: details.value }
-        setLoading(true)
-
-        try {
-            const response = await comment.create(payload)
-            if(response) {
-                launchToast(response)
-                setTimeout(() => revalidate(), 350)
-            }
-        } catch (error) {
-            const response = {
-                status: HttpStatusCode.servererror,
-                statusText: 'error',
-                message: HttpStatusMessages.servererror,
-            }
-            return launchToast(response)
-        } finally {
-            setLoading(false)
-        }
     }
 
     return (
@@ -194,6 +224,9 @@ export default function PostBodyPart({
                     </PostCard.Container>
                ))
             }
+            <Modal.Container>
+                <Modal.Header />
+            </Modal.Container>
         </>
     )
 }
