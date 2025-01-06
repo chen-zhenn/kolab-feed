@@ -108,7 +108,7 @@ export default function PostBodyPart({
             if (!comment.user_id) return
             const response = await user.getById(comment.user_id)
 
-            if (response && response.status === 200) 
+            if (response && response.status === HttpStatusCode.success) 
                 if (response.data && response.data.length){
                     const data = {
                         ...response.data[0],

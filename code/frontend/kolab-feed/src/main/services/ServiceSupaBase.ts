@@ -238,6 +238,24 @@ export class ServiceSupaBase {
         return HttpResponseHandler.handleSuccess<T>(data, 200, 'Usuário atualizado com sucesso!')
     }
 
+    async updateComment<T>(payload: ICommentData): Promise<IHttpResponse<T[]>> {
+        
+        if(
+            !payload ||
+            !payload.id ||
+            !Object.keys(payload).length
+        ) return HttpResponseHandler.handleError({ code: '42501' })
+
+        const { data, error } = await SupaBaseClient
+            .from(this.table)
+            .update([payload])
+            .eq('id', payload.id)
+            .select()
+
+        if(error) return HttpResponseHandler.handleError(error)
+        return HttpResponseHandler.handleSuccess<T>(data, 200, 'Comentário atualizado com sucesso!')
+    }
+
    //================================================================//
     //=                      READ DATA                                //
     //================================================================//
