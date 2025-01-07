@@ -1,4 +1,5 @@
 import { 
+    memo,
     useEffect, 
     useState, 
 } from 'react'
@@ -49,7 +50,7 @@ export interface IUserDataComment extends IUserData {
     comment_body?: string;
 }
 
-export default function PostBodyPart({ 
+function PostBodyPart({ 
     data, 
     handlers 
 }: IPostPage){
@@ -287,3 +288,5 @@ export default function PostBodyPart({
         </>
     )
 }
+
+export default memo(PostBodyPart) 

@@ -1,4 +1,5 @@
 import { 
+    memo,
     useEffect, 
     useState,
 } from 'react'
@@ -21,7 +22,7 @@ import {
 
 import { IPostPage } from '../types'
 
-export default function PostHeaderPart({ 
+function PostHeaderPart({ 
     data,
     postData, 
     handlers,
@@ -82,3 +83,5 @@ export default function PostHeaderPart({
         </Header>
     )
 }
+
+export default memo(PostHeaderPart)
