@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { 
     useLoaderData,
@@ -62,20 +62,23 @@ export default function Post() {
     })
 
     const { launchToast } = Utils
-    let posts: IPost[] = []
 
-    try {
-        
-        if(response && response.status === 200) 
-            if (response.data) posts = response?.data
-    } catch (error) {
-        const response = {
-            status: HttpStatusCode.servererror,
-            statusText: 'error',
-            message: HttpStatusMessages.servererror,
+    const posts: IPost[] = useMemo(() => {
+
+        try {
+            if(response && response.status === 200)
+                if (response.data) return response?.data
+        } catch (error) {
+            const response = {
+                status: HttpStatusCode.servererror,
+                statusText: 'error',
+                message: HttpStatusMessages.servererror,
+            }
+            launchToast(response)
         }
-        launchToast(response)
-    }
+
+        return []
+    }, [response, launchToast])
 
     function handlePostHeaderBody(post: IPost): React.ReactNode {
         return (
