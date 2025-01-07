@@ -1,4 +1,8 @@
-import { useMemo, useState } from 'react'
+import { 
+    useCallback, 
+    useMemo, 
+    useState,
+} from 'react'
 
 import { 
     useLoaderData,
@@ -80,7 +84,7 @@ export default function Post() {
         return []
     }, [response, launchToast])
 
-    function handlePostHeaderBody(post: IPost): React.ReactNode {
+    const handlePostHeaderBody = useCallback(function(post: IPost): React.ReactNode {
         return (
             <PostHeader.Container>
                 <PostHeader.Avatar 
@@ -99,9 +103,9 @@ export default function Post() {
                 />
             </PostHeader.Container>
         )
-    }
+    }, [pathname])
 
-    function handlePostContentBody(post: IPost): React.ReactNode {
+    const handlePostContentBody = useCallback(function(post: IPost): React.ReactNode {
         return (
             <PostContent.Container>
                 <PostContent.Title title={post.title} />
@@ -109,7 +113,7 @@ export default function Post() {
                 <PostContent.Image imageSource={post.image} />
             </PostContent.Container>
         )
-    }
+    }, []) 
 
     function handleModalContentBody(action: CrudAction): React.ReactNode {
         const content = {
@@ -156,7 +160,7 @@ export default function Post() {
         return content[action ?? 'add']
     }
 
-    function handleConfirmBodyPost(details: ValueChangeDetails): void {
+    const handleConfirmBodyPost = useCallback(function(details: ValueChangeDetails): void {
         nav(`${pathname.replace(/\/(add|edit|delete)\/?.*/, '')}/add`)
         setPostData(prevData => ({
             ...prevData,
@@ -164,7 +168,7 @@ export default function Post() {
         }))
         setAction('add')
         setOpen(true)
-    }
+    }, [pathname]) 
 
     function handleUpdatePost(post: IPost): void {
         nav(`${pathname.replace(/\/(add|edit|delete)\/?.*/, '')}/edit/${post.id}`)
@@ -213,7 +217,6 @@ export default function Post() {
         } 
     }
 
-    
     return (
         <>
             {
