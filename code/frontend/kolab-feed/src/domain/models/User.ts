@@ -1,5 +1,4 @@
 import { IAuth } from './Auth'
-import { ICommentData } from './Comments';
 
 export interface IUsers extends IAuth {
     id: string;
