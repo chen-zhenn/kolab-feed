@@ -1,5 +1,4 @@
 import { 
-    useEffect, 
     useState,
     useContext,
 } from 'react'
@@ -12,6 +11,7 @@ import {
 import { 
     Text,
     Card,
+    Spinner,
 } from '@chakra-ui/react'
 
 import { 
@@ -22,8 +22,6 @@ import {
 
 import { UIContext } from '@/states/context'
 
-import { IUsers } from '@/domain/models'
-
 import {
     IHttpResponse,
 } from '@/infra'
@@ -33,6 +31,10 @@ import {
 } from '@/main/usecases'
 
 import { Utils } from '@/presentation/shared'
+
+import { 
+    useGetUser, 
+} from '@/presentation/hooks'
 
 import {
     Avatar,
@@ -50,28 +52,13 @@ export default function TopBarProfilePart() {
     const uiState = useContext(UIContext)
     const { setVisibility } = uiState
     const nav = useNavigate()
-    const [userData, setUserData] = useState<IUsers>()
     const [open, setOpen] = useState(false)
-    const [loading, setLoading] = useState<boolean>(true)
-
-    useEffect(() => {
-        (async function(){
-            try {
-                const userAuth = await user.getUserAuth()
-                if(userAuth && userAuth.id) {
-                    const userResponse = await user.getById(userAuth.id)
-                    if(userResponse && userResponse.status === 200) {
-                        if(userResponse.data) setUserData({ ...userResponse.data[0], email: userAuth.email ?? '' })
-                    }
-                }
-            } catch (error) {
-                //
-            } finally {
-                setLoading(false)
-            }
-        }())
-    }, [])
-
+    
+    const { 
+        data: userData, 
+        loading,
+    } = useGetUser()
+    
     async function handleLogout(): Promise<IHttpResponse<any> | any> {
 
         try {
@@ -99,13 +86,22 @@ export default function TopBarProfilePart() {
 
     return (
         <Section className='-profile' open={open}>
-            <Avatar 
-                name={userData?.username} 
-                size='xl' 
-                src={userData?.avatar}
-                cursor='pointer'
-                onClick={() => setOpen(!open)} 
-            />
+            {
+                loading ? 
+                (
+                    <Spinner size='lg' borderWidth='5px' />
+                ) : 
+                (
+                    <Avatar 
+                    name={userData?.username} 
+                    size='xl' 
+                    src={userData?.avatar}
+                    cursor='pointer'
+                    onClick={() => setOpen(!open)} 
+                />
+                )
+            }
+
             <Card.Root className='card'>
                 {
                     loading ? (

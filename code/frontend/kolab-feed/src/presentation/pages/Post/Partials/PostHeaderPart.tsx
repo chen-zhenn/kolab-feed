@@ -1,14 +1,14 @@
 import { 
     memo,
-    useEffect, 
-    useState,
 } from 'react'
 
-import { IUsers } from '@/domain/models'
-
 import {
-    makeUser,  
-} from '@/main/usecases'
+    Spinner,
+} from '@chakra-ui/react'
+
+import { 
+    useGetUser, 
+} from '@/presentation/hooks'
 
 import { 
     PostCard,
@@ -28,34 +28,28 @@ function PostHeaderPart({
     handlers,
 }: IPostPage){
 
-    const user = makeUser()
-    const [userData, setUserData] = useState<IUsers>()
-
-    useEffect(() => {
-        (async function(){
-            try {
-                const userAuth = await user.getUserAuth()
-                if(userAuth && userAuth.id) {
-                    const userResponse = await user.getById(userAuth.id)
-                    if(userResponse && userResponse.status === 200) {
-                        if(userResponse.data) setUserData(userResponse.data[0])
-                    }
-                }
-            } catch (error) {
-                //
-            }
-        }())
-    }, [])
+    const { 
+        data: userData, 
+        loading,
+    } = useGetUser()
 
     return (
         <Header>
                 <PostCard.Container>
                     <PostCard.Header>
                         <PostHeader.Container>
-                        <PostHeader.Avatar 
-                            imageSource={userData?.avatar} 
-                            imageName={userData?.username} 
-                            />
+                        {
+                            loading ? 
+                            (
+                                <Spinner size='lg' />
+                            ) : 
+                            (
+                                <PostHeader.Avatar 
+                                    imageSource={userData?.avatar} 
+                                    imageName={userData?.username} 
+                                />
+                            )
+                        }
                             <aside style={{ flexGrow: 1 }}>
                                 <EditableField
                                     handlers={{ onConfirm: handlers?.handleConfirmBodyPost }} 
